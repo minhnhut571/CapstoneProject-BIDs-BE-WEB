@@ -29,6 +29,10 @@ namespace BIDs_API.Controllers
             try
             {
                 var response = await _StaffService.GetAll();
+                if (response == null)
+                {
+                    return NotFound();
+                }
                 return Ok(response);
             }
             catch
@@ -128,6 +132,22 @@ namespace BIDs_API.Controllers
         }
 
         // PUT api/<ValuesController>/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("deny_user/{DenyID}")]
+        public async Task<IActionResult> DenyAccountCreate([FromRoute] Guid DenyID)
+        {
+            try
+            {
+                await _StaffService.DenyCreate(DenyID);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // PUT api/<ValuesController>/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=212375
         [HttpPut("ban/{BanID}")]
         public async Task<IActionResult> BanUser([FromRoute] Guid BanID)
@@ -158,6 +178,7 @@ namespace BIDs_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
 
         //private bool StaffExists(Guid id)
         //{

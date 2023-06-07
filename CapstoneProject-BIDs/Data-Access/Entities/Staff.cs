@@ -5,6 +5,10 @@ namespace Data_Access.Entities;
 
 public partial class Staff
 {
+    public Staff()
+    {
+        Items = new HashSet<Item>();
+    }
     public Guid StaffId { get; set; }
 
     public Guid RoleId { get; set; }

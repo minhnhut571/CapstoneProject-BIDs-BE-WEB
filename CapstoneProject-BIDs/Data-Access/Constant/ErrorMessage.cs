@@ -15,6 +15,7 @@
             public readonly static string WRONG_CCCD_NUMBER_FORMAT = "Wrong cccd number format";
             public readonly static string PHONE_IS_EXITED = "Phone is exited";
             public readonly static string WRONG_PHONE_FORMAT = "Wrong phone format";
+            public readonly static string EMAIL_IS_NULL = "Email request is null";
         }
         #endregion
 

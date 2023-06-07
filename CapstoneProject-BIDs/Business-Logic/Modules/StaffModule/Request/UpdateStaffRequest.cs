@@ -47,7 +47,7 @@ namespace Business_Logic.Modules.StaffModule.Request
             //RuleFor(x => x.UpdateDate).NotEmpty().NotNull();
             //RuleFor(x => x.CreateDate).NotEmpty().NotNull();
             RuleFor(x => x.Notification).NotEmpty().NotNull();
-            RuleFor(x => x.Status).NotEmpty().NotNull();
+            //RuleFor(x => x.Status).NotEmpty().NotNull();
         }
     }
 }
