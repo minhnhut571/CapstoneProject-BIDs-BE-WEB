@@ -14,12 +14,11 @@ namespace Business_Logic.Modules.UserModule.Interface
 
         public Task UpdateUser(UpdateUserRequest UserUpdate);
 
-        public Task DeleteUser(Guid? userDeleteID);
-
         public Task<ICollection<User>> GetAll();
 
         public Task<User> GetUserByID(Guid? id);
 
         public Task<User> GetUserByName(string Name);
+
     }
 }

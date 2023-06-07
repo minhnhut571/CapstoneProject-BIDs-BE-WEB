@@ -3,6 +3,11 @@ using Business_Logic.Modules.UserModule.Request;
 using Data_Access.Constant;
 using Data_Access.Entities;
 using FluentValidation.Results;
+using System.Net.Mail;
+using System.Net;
+using FluentValidation;
+using System;
+using System.Text;
 
 namespace Business_Logic.Modules.UserModule
 {
@@ -19,9 +24,14 @@ namespace Business_Logic.Modules.UserModule
             return await _UserRepository.GetAll(options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
-        public Task<ICollection<User>> GetUsersIsNotBan()
+        public async Task<ICollection<User>> GetUsersIsNotBan()
         {
-            return _UserRepository.GetUsersBy(x => x.Status == true, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+            return await _UserRepository.GetUsersBy(x => x.Status == true, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+        }
+
+        public async Task<ICollection<User>> GetUsersIsNotActive()
+        {
+            return await _UserRepository.GetUsersBy(x => x.Status == false, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
         public async Task<User> GetUserByID(Guid? id)
@@ -116,7 +126,7 @@ namespace Business_Logic.Modules.UserModule
             newUser.CccdbackImage = userRequest.CccdbackImage;
             newUser.CreateDate = DateTime.Now;
             newUser.UpdateDate = DateTime.Now;
-            //newUser.Notification = null;            
+            newUser.Notification = "Chưa được chấp thuận";
             newUser.Status = false;
 
             await _UserRepository.AddAsync(newUser);
@@ -170,7 +180,6 @@ namespace Business_Logic.Modules.UserModule
                 userUpdate.Email = userRequest.Email;
                 userUpdate.Address = userRequest.Address;
                 userUpdate.Phone = userRequest.Phone;
-                userUpdate.Notification = userRequest.Notification;
                 //userUpdate.Status = userRequest.Status;
                 userUpdate.UpdateDate = DateTime.Now;
 
@@ -184,30 +193,33 @@ namespace Business_Logic.Modules.UserModule
 
         }
 
-        public async Task DeleteUser(Guid? userDeleteID)
-        {
-            try
-            {
-                if (userDeleteID == null)
-                {
-                    throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
-                }
+        //public async Task NotiForUser(NotiForUserRequest notiForUser)
+        //{
+        //    try
+        //    {
+        //        var notiUser = GetUserByID(notiForUser.UserId).Result;
 
-                User userDelete = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == userDeleteID && x.Status == true).Result;
+        //        if (notiUser == null)
+        //        {
+        //            throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
+        //        }
 
-                if (userDelete == null)
-                {
-                    throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
-                }
+        //        ValidationResult result = new NotiForUserRequestValidator().Validate(notiForUser);
+        //        if (!result.IsValid)
+        //        {
+        //            throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
+        //        }
 
-                userDelete.Status = false;
-                await _UserRepository.UpdateAsync(userDelete);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error at delete type: " + ex.Message);
-                throw new Exception(ex.Message);
-            }
-        }
+
+        //        notiUser.Notification = notiForUser.Notification;
+        //        await _UserRepository.UpdateAsync(notiUser);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("Error at delete type: " + ex.Message);
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
+
     }
 }

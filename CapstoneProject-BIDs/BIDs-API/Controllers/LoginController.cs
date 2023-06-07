@@ -33,5 +33,22 @@ namespace BIDs_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // PUT api/<ValuesController>/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("reset-password/{email}")]
+        public async Task<IActionResult> ResetPassword([FromRoute] string email)
+        {
+            try
+            {
+                await _LoginService.ResetPassword(email);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

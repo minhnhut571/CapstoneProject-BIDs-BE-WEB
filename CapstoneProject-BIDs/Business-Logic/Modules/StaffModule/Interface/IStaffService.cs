@@ -24,8 +24,11 @@ namespace Business_Logic.Modules.StaffModule.Interface
 
         public Task AcceptCreateAccount(Guid? CreateAccountID);
 
+        public Task DenyCreate(Guid? CreateAccountID);
+
         public Task BanUser(Guid? BanUserID);
 
         public Task UnbanUser(Guid? UnbanUserID);
+
     }
 }

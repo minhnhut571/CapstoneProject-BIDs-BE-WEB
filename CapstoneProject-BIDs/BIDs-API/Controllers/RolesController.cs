@@ -29,6 +29,10 @@ namespace BIDs_API.Controllers
             try
             {
                 var response = await _RoleService.GetAll();
+                if(response == null)
+                {
+                    return NotFound();
+                }
                 return Ok(response);
             }
             catch

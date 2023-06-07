@@ -23,6 +23,10 @@ namespace BIDs_API.Controllers
             try
             {
                 var response = await _userService.GetAll();
+                if (response == null)
+                {
+                    return NotFound();
+                }
                 return Ok(response);
             }
             catch
@@ -90,20 +94,21 @@ namespace BIDs_API.Controllers
             }
         }
 
-        // DELETE api/<ValuesController>/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
-        {
-            try
-            {
-                await _userService.DeleteUser(id);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+
+        //// DELETE api/<ValuesController>/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
+        //{
+        //    try
+        //    {
+        //        await _userService.DeleteUser(id);
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
 
         //private bool UserExists(Guid id)
         //{

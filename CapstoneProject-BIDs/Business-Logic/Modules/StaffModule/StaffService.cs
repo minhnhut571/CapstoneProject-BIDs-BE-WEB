@@ -4,6 +4,10 @@ using Business_Logic.Modules.UserModule.Interface;
 using Data_Access.Constant;
 using Data_Access.Entities;
 using FluentValidation.Results;
+using System.Net.Mail;
+using System.Net;
+using static System.Net.WebRequestMethods;
+using System.Text;
 
 namespace Business_Logic.Modules.StaffModule
 {
@@ -107,8 +111,8 @@ namespace Business_Logic.Modules.StaffModule
             newStaff.DateOfBirth = StaffRequest.DateOfBirth;
             newStaff.CreateDate = DateTime.Now;
             newStaff.UpdateDate = DateTime.Now;
-            //newStaff.Notification = null;            
-            newStaff.Status = false;
+            newStaff.Notification = "Khởi tạo thành công";         
+            newStaff.Status = true;
 
             await _StaffRepository.AddAsync(newStaff);
             return newStaff.StaffId;
@@ -163,7 +167,7 @@ namespace Business_Logic.Modules.StaffModule
                 StaffUpdate.Address = StaffRequest.Address;
                 StaffUpdate.Phone = StaffRequest.Phone;
                 StaffUpdate.Notification = StaffRequest.Notification;
-                StaffUpdate.Status = StaffRequest.Status;
+                //StaffUpdate.Status = StaffRequest.Status;
                 StaffUpdate.UpdateDate = DateTime.Now;
 
                 await _StaffRepository.UpdateAsync(StaffUpdate);
@@ -218,8 +222,86 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.UserError.ACCOUNT_CREATE_NOT_FOUND);
                 }
 
+                string _gmail = "bidauctionfloor@gmail.com";
+                string _password = "auctionfloor123";
+
+                string sendto = UserCreate.Email;
+                string subject = "[BIDs] - Dịch vụ tài khoản";
+                string content = "Tài khoản" + UserCreate.AccountName + " đã được khởi tạo thành công, chúc bạn có những phút giây sử dụng hệ thống vui vẻ";
+
                 UserCreate.Status = true;
+                UserCreate.Notification = "Khởi tạo thành công, chào mừng đến với BIDs";
                 await _UserRepository.UpdateAsync(UserCreate);
+
+                MailMessage mail = new MailMessage();
+                SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+
+                mail.From = new MailAddress(_gmail);
+                mail.To.Add(UserCreate.Email);
+                mail.Subject = subject;
+                mail.IsBodyHtml = true;
+                mail.Body = content;
+
+                mail.Priority = MailPriority.High;
+
+                SmtpServer.Port = 587;
+                SmtpServer.UseDefaultCredentials = false;
+                SmtpServer.Credentials = new NetworkCredential(_gmail, _password);
+                SmtpServer.EnableSsl = true;
+
+                SmtpServer.Send(mail);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error at accept create account type: " + ex.Message);
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task DenyCreate(Guid? accountCreateID)
+        {
+            try
+            {
+                if (accountCreateID == null)
+                {
+                    throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
+                }
+
+                User UserCreate = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == accountCreateID && x.Status == false).Result;
+
+                if (UserCreate == null)
+                {
+                    throw new Exception(ErrorMessage.UserError.ACCOUNT_CREATE_NOT_FOUND);
+                }
+
+                string _gmail = "bidauctionfloor@gmail.com";
+                string _password = "auctionfloor123";
+
+                string sendto = UserCreate.Email;
+                string subject = "[BIDs] - Dịch vụ tài khoản";
+                string content = "Tài khoản" + UserCreate.AccountName + " khởi tạo không thành công vì thông tin bạn cung cấp không chính xác!";
+
+                UserCreate.Status = false;
+                UserCreate.Notification = "Khởi tạo thất bại, thông tin không hợp lệ";
+                await _UserRepository.UpdateAsync(UserCreate);
+
+                MailMessage mail = new MailMessage();
+                SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+
+                mail.From = new MailAddress(_gmail);
+                mail.To.Add(UserCreate.Email);
+                mail.Subject = subject;
+                mail.IsBodyHtml = true;
+                mail.Body = content;
+
+                mail.Priority = MailPriority.High;
+
+                SmtpServer.Port = 587;
+                SmtpServer.UseDefaultCredentials = false;
+                SmtpServer.Credentials = new NetworkCredential(_gmail, _password);
+                SmtpServer.EnableSsl = true;
+
+                SmtpServer.Send(mail);
             }
             catch (Exception ex)
             {
@@ -237,15 +319,40 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                User UserBan = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == UserBanID && x.Status == true).Result;
+                var UserBan = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == UserBanID && x.Status == true).Result;
 
                 if (UserBan == null)
                 {
                     throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
                 }
 
+                string _gmail = "bidauctionfloor@gmail.com";
+                string _password = "auctionfloor123";
+
+                string sendto = UserBan.Email;
+                string subject = "[BIDs] - Dịch vụ tài khoản";
+                string content = "Tài khoản" + UserBan.AccountName + "đã bị khóa, bạn sẽ không thể sử dụng dịch vụ của hệ thống chúng tôi! ";
+
                 UserBan.Status = false;
                 await _UserRepository.UpdateAsync(UserBan);
+
+                MailMessage mail = new MailMessage();
+                SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+
+                mail.From = new MailAddress(_gmail);
+                mail.To.Add(UserBan.Email);
+                mail.Subject = subject;
+                mail.IsBodyHtml = true;
+                mail.Body = content;
+
+                mail.Priority = MailPriority.High;
+
+                SmtpServer.Port = 587;
+                SmtpServer.UseDefaultCredentials = false;
+                SmtpServer.Credentials = new NetworkCredential(_gmail, _password);
+                SmtpServer.EnableSsl = true;
+
+                SmtpServer.Send(mail);
             }
             catch (Exception ex)
             {
@@ -270,8 +377,33 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
                 }
 
+                string _gmail = "bidauctionfloor@gmail.com";
+                string _password = "auctionfloor123";
+
+                string sendto = UserUnban.Email;
+                string subject = "[BIDs] - Dịch vụ tài khoản";
+                string content = "Tài khoản" + UserUnban.AccountName + "đã được mở khóa, mong bạn sẽ có những trải nghiệm tốt tại hệ thống. ";
+
                 UserUnban.Status = true;
                 await _UserRepository.UpdateAsync(UserUnban);
+
+                MailMessage mail = new MailMessage();
+                SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+
+                mail.From = new MailAddress(_gmail);
+                mail.To.Add(UserUnban.Email);
+                mail.Subject = subject;
+                mail.IsBodyHtml = true;
+                mail.Body = content;
+
+                mail.Priority = MailPriority.High;
+
+                SmtpServer.Port = 587;
+                SmtpServer.UseDefaultCredentials = false;
+                SmtpServer.Credentials = new NetworkCredential(_gmail, _password);
+                SmtpServer.EnableSsl = true;
+
+                SmtpServer.Send(mail);
             }
             catch (Exception ex)
             {

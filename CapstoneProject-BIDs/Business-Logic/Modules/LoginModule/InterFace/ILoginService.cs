@@ -10,5 +10,7 @@ namespace Business_Logic.Modules.LoginModule.InterFace
     public interface ILoginService
     {
         public Task<string> Login(LoginRequest loginRequest);
+
+        public Task ResetPassword(string email);
     }
 }
