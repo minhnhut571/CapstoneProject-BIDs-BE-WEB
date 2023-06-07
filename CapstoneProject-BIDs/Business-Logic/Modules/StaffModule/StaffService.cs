@@ -215,7 +215,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                User UserCreate = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == accountCreateID && x.Status == false).Result;
+                User UserCreate = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == accountCreateID && x.Status == 0).Result;
 
                 if (UserCreate == null)
                 {
@@ -229,7 +229,7 @@ namespace Business_Logic.Modules.StaffModule
                 string subject = "[BIDs] - Dịch vụ tài khoản";
                 string content = "Tài khoản" + UserCreate.AccountName + " đã được khởi tạo thành công, chúc bạn có những phút giây sử dụng hệ thống vui vẻ";
 
-                UserCreate.Status = true;
+                UserCreate.Status = 0;
                 UserCreate.Notification = "Khởi tạo thành công, chào mừng đến với BIDs";
                 await _UserRepository.UpdateAsync(UserCreate);
 
@@ -267,7 +267,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                User UserCreate = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == accountCreateID && x.Status == false).Result;
+                User UserCreate = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == accountCreateID && x.Status == 0).Result;
 
                 if (UserCreate == null)
                 {
@@ -281,7 +281,7 @@ namespace Business_Logic.Modules.StaffModule
                 string subject = "[BIDs] - Dịch vụ tài khoản";
                 string content = "Tài khoản" + UserCreate.AccountName + " khởi tạo không thành công vì thông tin bạn cung cấp không chính xác!";
 
-                UserCreate.Status = false;
+                UserCreate.Status = 0;
                 UserCreate.Notification = "Khởi tạo thất bại, thông tin không hợp lệ";
                 await _UserRepository.UpdateAsync(UserCreate);
 
@@ -319,7 +319,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                var UserBan = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == UserBanID && x.Status == true).Result;
+                var UserBan = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == UserBanID && x.Status == 0).Result;
 
                 if (UserBan == null)
                 {
@@ -333,7 +333,7 @@ namespace Business_Logic.Modules.StaffModule
                 string subject = "[BIDs] - Dịch vụ tài khoản";
                 string content = "Tài khoản" + UserBan.AccountName + "đã bị khóa, bạn sẽ không thể sử dụng dịch vụ của hệ thống chúng tôi! ";
 
-                UserBan.Status = false;
+                UserBan.Status = 0;
                 await _UserRepository.UpdateAsync(UserBan);
 
                 MailMessage mail = new MailMessage();
@@ -370,7 +370,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                User UserUnban = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == UserUnbanID && x.Status == false).Result;
+                User UserUnban = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == UserUnbanID && x.Status == 0).Result;
 
                 if (UserUnban == null)
                 {
@@ -384,7 +384,7 @@ namespace Business_Logic.Modules.StaffModule
                 string subject = "[BIDs] - Dịch vụ tài khoản";
                 string content = "Tài khoản" + UserUnban.AccountName + "đã được mở khóa, mong bạn sẽ có những trải nghiệm tốt tại hệ thống. ";
 
-                UserUnban.Status = true;
+                UserUnban.Status = 0;
                 await _UserRepository.UpdateAsync(UserUnban);
 
                 MailMessage mail = new MailMessage();

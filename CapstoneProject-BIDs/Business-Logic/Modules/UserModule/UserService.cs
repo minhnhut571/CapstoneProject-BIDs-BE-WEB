@@ -26,12 +26,12 @@ namespace Business_Logic.Modules.UserModule
 
         public async Task<ICollection<User>> GetUsersIsNotBan()
         {
-            return await _UserRepository.GetUsersBy(x => x.Status == true, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+            return await _UserRepository.GetUsersBy(x => x.Status == 0, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
         public async Task<ICollection<User>> GetUsersIsNotActive()
         {
-            return await _UserRepository.GetUsersBy(x => x.Status == false, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+            return await _UserRepository.GetUsersBy(x => x.Status == 0, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
         public async Task<User> GetUserByID(Guid? id)
@@ -127,7 +127,7 @@ namespace Business_Logic.Modules.UserModule
             newUser.CreateDate = DateTime.Now;
             newUser.UpdateDate = DateTime.Now;
             newUser.Notification = "Chưa được chấp thuận";
-            newUser.Status = false;
+            newUser.Status = 0;
 
             await _UserRepository.AddAsync(newUser);
             return newUser.UserId;

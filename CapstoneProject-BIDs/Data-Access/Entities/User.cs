@@ -33,7 +33,7 @@ public partial class User
 
     public string Notification { get; set; }
 
-    public bool Status { get; set; }
+    public int Status { get; set; }
 
     public virtual ICollection<BanHistory> BanHistories { get; } = new List<BanHistory>();
 
