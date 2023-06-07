@@ -8,6 +8,7 @@ using System.Net.Mail;
 using System.Net;
 using static System.Net.WebRequestMethods;
 using System.Text;
+using Data_Access.Enum;
 
 namespace Business_Logic.Modules.StaffModule
 {
@@ -229,7 +230,7 @@ namespace Business_Logic.Modules.StaffModule
                 string subject = "[BIDs] - Dịch vụ tài khoản";
                 string content = "Tài khoản" + UserCreate.AccountName + " đã được khởi tạo thành công, chúc bạn có những phút giây sử dụng hệ thống vui vẻ";
 
-                UserCreate.Status = 0;
+                UserCreate.Status = (int)UserStatusEnum.Acctive;
                 UserCreate.Notification = "Khởi tạo thành công, chào mừng đến với BIDs";
                 await _UserRepository.UpdateAsync(UserCreate);
 
@@ -281,7 +282,7 @@ namespace Business_Logic.Modules.StaffModule
                 string subject = "[BIDs] - Dịch vụ tài khoản";
                 string content = "Tài khoản" + UserCreate.AccountName + " khởi tạo không thành công vì thông tin bạn cung cấp không chính xác!";
 
-                UserCreate.Status = 0;
+                UserCreate.Status = (int)UserStatusEnum.Deny;
                 UserCreate.Notification = "Khởi tạo thất bại, thông tin không hợp lệ";
                 await _UserRepository.UpdateAsync(UserCreate);
 
@@ -333,7 +334,7 @@ namespace Business_Logic.Modules.StaffModule
                 string subject = "[BIDs] - Dịch vụ tài khoản";
                 string content = "Tài khoản" + UserBan.AccountName + "đã bị khóa, bạn sẽ không thể sử dụng dịch vụ của hệ thống chúng tôi! ";
 
-                UserBan.Status = 0;
+                UserBan.Status = (int)UserStatusEnum.Ban;
                 await _UserRepository.UpdateAsync(UserBan);
 
                 MailMessage mail = new MailMessage();
@@ -384,7 +385,7 @@ namespace Business_Logic.Modules.StaffModule
                 string subject = "[BIDs] - Dịch vụ tài khoản";
                 string content = "Tài khoản" + UserUnban.AccountName + "đã được mở khóa, mong bạn sẽ có những trải nghiệm tốt tại hệ thống. ";
 
-                UserUnban.Status = 0;
+                UserUnban.Status = (int)UserStatusEnum.Acctive;
                 await _UserRepository.UpdateAsync(UserUnban);
 
                 MailMessage mail = new MailMessage();

@@ -16,6 +16,12 @@ namespace Business_Logic.Modules.UserModule.Interface
 
         public Task<ICollection<User>> GetAll();
 
+        public Task<ICollection<User>> GetUsersIsActive();
+
+        public Task<ICollection<User>> GetUsersIsBan();
+
+        public Task<ICollection<User>> GetUsersIsWaitting();
+
         public Task<User> GetUserByID(Guid? id);
 
         public Task<User> GetUserByName(string Name);

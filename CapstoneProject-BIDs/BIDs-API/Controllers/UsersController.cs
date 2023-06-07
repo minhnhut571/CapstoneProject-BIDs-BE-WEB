@@ -35,6 +35,63 @@ namespace BIDs_API.Controllers
             }
         }
 
+        // GET api/<ValuesController>
+        [HttpGet("get-active")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersActive()
+        {
+            try
+            {
+                var response = await _userService.GetUsersIsActive();
+                if (response == null)
+                {
+                    return NotFound();
+                }
+                return Ok(response);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        // GET api/<ValuesController>
+        [HttpGet("get-waitting")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersWaitting()
+        {
+            try
+            {
+                var response = await _userService.GetUsersIsWaitting();
+                if (response == null)
+                {
+                    return NotFound();
+                }
+                return Ok(response);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        // GET api/<ValuesController>
+        [HttpGet("get-ban")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersBan()
+        {
+            try
+            {
+                var response = await _userService.GetUsersIsBan();
+                if (response == null)
+                {
+                    return NotFound();
+                }
+                return Ok(response);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUserByID([FromRoute] Guid id)
