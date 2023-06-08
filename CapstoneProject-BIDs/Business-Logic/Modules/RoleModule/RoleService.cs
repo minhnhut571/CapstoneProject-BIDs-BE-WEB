@@ -39,7 +39,7 @@ namespace Business_Logic.Modules.RoleModule
             return Role;
         }
 
-        public async Task<Role> GetRoleByName(String RoleName)
+        public async Task<Role> GetRoleByName(string RoleName)
         {
             if (RoleName == null)
             {

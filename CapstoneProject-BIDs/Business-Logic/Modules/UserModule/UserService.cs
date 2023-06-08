@@ -54,7 +54,7 @@ namespace Business_Logic.Modules.UserModule
             return user;
         }
 
-        public async Task<User> GetUserByName(String userName)
+        public async Task<User> GetUserByName(string userName)
         {
             if (userName == null)
             {

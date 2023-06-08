@@ -50,5 +50,28 @@
             public readonly static string WRONG_ACCOUNT_NAME_OR_PASSWORD = "Wrong account name or password";
         }
         #endregion
+
+        #region ItemType error message
+        public static class ItemTypeError
+        {
+            public readonly static string ITEM_TYPE_NOT_FOUND = "ItemType is not existed";
+            public readonly static string ITEM_TYPE_EXISTED = "ItemType is existed";
+        }
+        #endregion
+
+        #region Session error message
+        public static class SessionError
+        {
+            public readonly static string SESSION_NOT_FOUND = "Session is not existed";
+            public readonly static string SESSION_EXISTED = "Session is existed";
+        }
+        #endregion
+
+        #region Ban History error message
+        public static class BanHistoryError
+        {
+            public readonly static string BAN_HISTORY_NOT_FOUND = "Ban History is not existed";
+        }
+        #endregion
     }
 }

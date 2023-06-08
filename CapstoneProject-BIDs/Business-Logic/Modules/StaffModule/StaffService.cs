@@ -46,7 +46,7 @@ namespace Business_Logic.Modules.StaffModule
             return Staff;
         }
 
-        public async Task<Staff> GetStaffByName(String StaffName)
+        public async Task<Staff> GetStaffByName(string StaffName)
         {
             if (StaffName == null)
             {
@@ -224,7 +224,7 @@ namespace Business_Logic.Modules.StaffModule
                 }
 
                 string _gmail = "bidauctionfloor@gmail.com";
-                string _password = "auctionfloor123";
+                string _password = "gnauvhbfubtgxjow";
 
                 string sendto = UserCreate.Email;
                 string subject = "[BIDs] - Dịch vụ tài khoản";
@@ -276,7 +276,7 @@ namespace Business_Logic.Modules.StaffModule
                 }
 
                 string _gmail = "bidauctionfloor@gmail.com";
-                string _password = "auctionfloor123";
+                string _password = "gnauvhbfubtgxjow";
 
                 string sendto = UserCreate.Email;
                 string subject = "[BIDs] - Dịch vụ tài khoản";
@@ -328,7 +328,7 @@ namespace Business_Logic.Modules.StaffModule
                 }
 
                 string _gmail = "bidauctionfloor@gmail.com";
-                string _password = "auctionfloor123";
+                string _password = "gnauvhbfubtgxjow";
 
                 string sendto = UserBan.Email;
                 string subject = "[BIDs] - Dịch vụ tài khoản";
@@ -379,7 +379,7 @@ namespace Business_Logic.Modules.StaffModule
                 }
 
                 string _gmail = "bidauctionfloor@gmail.com";
-                string _password = "auctionfloor123";
+                string _password = "gnauvhbfubtgxjow";
 
                 string sendto = UserUnban.Email;
                 string subject = "[BIDs] - Dịch vụ tài khoản";
