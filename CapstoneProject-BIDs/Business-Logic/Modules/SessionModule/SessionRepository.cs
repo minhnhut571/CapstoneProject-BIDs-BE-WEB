@@ -1,4 +1,4 @@
-﻿using Business_Logic.Modules.RoleModule.Interface;
+﻿using Business_Logic.Modules.SessionModule.Interface;
 using Common.Utils.Repository;
 using Data_Access.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -9,24 +9,24 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business_Logic.Modules.RoleModule
+namespace Business_Logic.Modules.SessionModule
 {
-    public class RoleRepository : Repository<Role>, IRoleRepository
+    public class SessionRepository : Repository<Session>, ISessionRepository
     {
         private readonly BidsContext _db;
 
-        public RoleRepository(BidsContext db) : base(db)
+        public SessionRepository(BidsContext db) : base(db)
         {
             _db = db;
         }
 
-        public async Task<ICollection<Role>> GetRolesBy(
-            Expression<Func<Role, bool>> filter = null,
-            Func<IQueryable<Role>, ICollection<Role>> options = null,
+        public async Task<ICollection<Session>> GetSessionsBy(
+            Expression<Func<Session, bool>> filter = null,
+            Func<IQueryable<Session>, ICollection<Session>> options = null,
             string includeProperties = null
         )
         {
-            IQueryable<Role> query = DbSet;
+            IQueryable<Session> query = DbSet;
 
             if (filter != null)
             {

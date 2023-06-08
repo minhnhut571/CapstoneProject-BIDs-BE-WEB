@@ -1,4 +1,4 @@
-﻿using Business_Logic.Modules.RoleModule.Interface;
+﻿using Business_Logic.Modules.BanHistoryModule.Interface;
 using Common.Utils.Repository;
 using Data_Access.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -9,24 +9,24 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business_Logic.Modules.RoleModule
+namespace Business_Logic.Modules.BanHistoryModule
 {
-    public class RoleRepository : Repository<Role>, IRoleRepository
+    public class BanHistoryRepository : Repository<BanHistory>, IBanHistoryRepository
     {
         private readonly BidsContext _db;
 
-        public RoleRepository(BidsContext db) : base(db)
+        public BanHistoryRepository(BidsContext db) : base(db)
         {
             _db = db;
         }
 
-        public async Task<ICollection<Role>> GetRolesBy(
-            Expression<Func<Role, bool>> filter = null,
-            Func<IQueryable<Role>, ICollection<Role>> options = null,
+        public async Task<ICollection<BanHistory>> GetBanHistorysBy(
+            Expression<Func<BanHistory, bool>> filter = null,
+            Func<IQueryable<BanHistory>, ICollection<BanHistory>> options = null,
             string includeProperties = null
         )
         {
-            IQueryable<Role> query = DbSet;
+            IQueryable<BanHistory> query = DbSet;
 
             if (filter != null)
             {

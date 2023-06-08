@@ -7,13 +7,13 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business_Logic.Modules.RoleModule.Interface
+namespace Business_Logic.Modules.ItemTypeModule.Interface
 {
-    public interface IRoleRepository : IRepository<Role>
+    public interface IItemTypeRepository : IRepository<ItemType>
     {
-        public Task<ICollection<Role>> GetRolesBy(
-               Expression<Func<Role, bool>> filter = null,
-               Func<IQueryable<Role>, ICollection<Role>> options = null,
+        public Task<ICollection<ItemType>> GetItemTypesBy(
+               Expression<Func<ItemType, bool>> filter = null,
+               Func<IQueryable<ItemType>, ICollection<ItemType>> options = null,
                string includeProperties = null
            );
     }
