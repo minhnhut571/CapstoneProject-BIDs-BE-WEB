@@ -5,34 +5,16 @@ namespace Business_Logic.Modules.UserModule.Request
 {
     public class CreateUserRequest
     {
-        //public Guid UserId { get; set; }
         public string AccountName { get; set; }
-
         public string UserName { get; set; }
-
         public string Email { get; set; }
-
         public string Password { get; set; }
-
         public string Address { get; set; }
-
         public string Phone { get; set; }
-
         public DateTime DateOfBirth { get; set; }
-
         public string Cccdnumber { get; set; }
-
-        public byte[] CccdfrontImage { get; set; }
-
-        public byte[] CccdbackImage { get; set; }
-
-        //public DateTime UpdateDate { get; set; }
-
-        //public DateTime CreateDate { get; set; }
-
-        //public string Notification { get; set; }
-
-        //public bool Status { get; set; }
+        public string CccdfrontImage { get; set; }
+        public string CccdbackImage { get; set; }
     }
     public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
     {

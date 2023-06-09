@@ -167,8 +167,6 @@ namespace Business_Logic.Modules.StaffModule
                 StaffUpdate.Email = StaffRequest.Email;
                 StaffUpdate.Address = StaffRequest.Address;
                 StaffUpdate.Phone = StaffRequest.Phone;
-                StaffUpdate.Notification = StaffRequest.Notification;
-                //StaffUpdate.Status = StaffRequest.Status;
                 StaffUpdate.UpdateDate = DateTime.Now;
 
                 await _StaffRepository.UpdateAsync(StaffUpdate);

@@ -12,10 +12,10 @@ namespace Common.Utils.Repository
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly BidsContext _db;
+        private readonly BIDsContext _db;
         public readonly DbSet<T> DbSet;
 
-        public Repository(BidsContext db)
+        public Repository(BIDsContext db)
         {
             _db = db;
             DbSet = _db.Set<T>();

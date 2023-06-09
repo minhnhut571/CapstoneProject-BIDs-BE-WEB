@@ -50,5 +50,20 @@ namespace BIDs_API.Controllers
             }
         }
 
+        // PUT api/<ValuesController>/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("send-email/{email}")]
+        public async Task<IActionResult> sendemail([FromRoute] string email)
+        {
+            try
+            {
+                await _LoginService.sendemail(email);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

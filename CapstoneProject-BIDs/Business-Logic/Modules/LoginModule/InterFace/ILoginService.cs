@@ -12,5 +12,6 @@ namespace Business_Logic.Modules.LoginModule.InterFace
         public Task<string> Login(LoginRequest loginRequest);
 
         public Task ResetPassword(string email);
+        public Task sendemail(string email);
     }
 }

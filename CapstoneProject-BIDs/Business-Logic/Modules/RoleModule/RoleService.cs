@@ -25,7 +25,7 @@ namespace Business_Logic.Modules.RoleModule
             return _RoleRepository.GetRolesBy(x => x.Status == true);
         }
 
-        public async Task<Role> GetRoleByID(Guid? id)
+        public async Task<Role> GetRoleByID(int id)
         {
             if (id == null)
             {
@@ -53,7 +53,7 @@ namespace Business_Logic.Modules.RoleModule
             return Role;
         }
 
-        public async Task<Guid?> AddNewRole(CreateRoleRequest RoleRequest)
+        public async Task<int> AddNewRole(CreateRoleRequest RoleRequest)
         {
 
             ValidationResult result = new CreateRoleRequestValidator().Validate(RoleRequest);
@@ -71,7 +71,6 @@ namespace Business_Logic.Modules.RoleModule
 
             var newRole = new Role();
 
-            newRole.RoleId = Guid.NewGuid();
             newRole.RoleName = RoleRequest.RoleName;
             newRole.Status = true;
 
@@ -116,7 +115,7 @@ namespace Business_Logic.Modules.RoleModule
 
         }
 
-        public async Task DeleteRole(Guid? RoleDeleteID)
+        public async Task DeleteRole(int RoleDeleteID)
         {
             try
             {

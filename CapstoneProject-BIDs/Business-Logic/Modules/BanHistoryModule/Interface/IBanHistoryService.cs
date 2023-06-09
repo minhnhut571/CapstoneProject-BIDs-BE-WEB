@@ -14,7 +14,7 @@ namespace Business_Logic.Modules.BanHistoryModule.Interface
 
         public Task UpdateBanHistory(UpdateBanHistoryRequest BanHistoryUpdate);
 
-        public Task DeleteBanHistory(Guid? BanHistoryDeleteID);
+        //public Task DeleteBanHistory(Guid? BanHistoryDeleteID);
 
         public Task<ICollection<BanHistory>> GetAll();
 

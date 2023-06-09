@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Data_Access.Entities;
+#nullable disable
 
-public partial class Role
+namespace Data_Access.Entities
 {
-    public Guid RoleId { get; set; }
+    public partial class Role
+    {
+        public Role()
+        {
+            Staff = new HashSet<Staff>();
+        }
 
-    public string RoleName { get; set; }
+        public string RoleName { get; set; }
+        public bool Status { get; set; }
+        public int RoleId { get; set; }
 
-    public bool Status { get; set; }
-
-    public virtual ICollection<Staff> Staff { get; } = new List<Staff>();
+        public virtual ICollection<Staff> Staff { get; set; }
+    }
 }

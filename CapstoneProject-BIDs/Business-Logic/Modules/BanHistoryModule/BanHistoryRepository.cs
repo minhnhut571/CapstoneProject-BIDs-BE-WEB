@@ -13,9 +13,9 @@ namespace Business_Logic.Modules.BanHistoryModule
 {
     public class BanHistoryRepository : Repository<BanHistory>, IBanHistoryRepository
     {
-        private readonly BidsContext _db;
+        private readonly BIDsContext _db;
 
-        public BanHistoryRepository(BidsContext db) : base(db)
+        public BanHistoryRepository(BIDsContext db) : base(db)
         {
             _db = db;
         }

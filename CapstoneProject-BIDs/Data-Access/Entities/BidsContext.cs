@@ -1,276 +1,330 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Data_Access.Entities;
+#nullable disable
 
-public partial class BidsContext : DbContext
+namespace Data_Access.Entities
 {
-    public BidsContext()
+    public partial class BIDsContext : DbContext
     {
-    }
+        public BIDsContext()
+        {
+        }
 
-    public BidsContext(DbContextOptions<BidsContext> options)
-        : base(options)
-    {
-    }
+        public BIDsContext(DbContextOptions<BIDsContext> options)
+            : base(options)
+        {
+        }
 
-    public virtual DbSet<BanHistory> BanHistories { get; set; }
+        public virtual DbSet<BanHistory> BanHistories { get; set; }
+        public virtual DbSet<Item> Items { get; set; }
+        public virtual DbSet<ItemType> ItemTypes { get; set; }
+        public virtual DbSet<Payment> Payments { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<Session> Sessions { get; set; }
+        public virtual DbSet<SessionDetail> SessionDetails { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Staff> Staffs { get; set; }
 
-    public virtual DbSet<BidderPrice> BidderPrices { get; set; }
-
-    public virtual DbSet<Item> Items { get; set; }
-
-    public virtual DbSet<ItemType> ItemTypes { get; set; }
-
-    public virtual DbSet<Payment> Payments { get; set; }
-
-    public virtual DbSet<Role> Roles { get; set; }
-
-    public virtual DbSet<Session> Sessions { get; set; }
-
-    public virtual DbSet<Staff> Staff { get; set; }
-
-    public virtual DbSet<User> Users { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("server =MINHNHUT\\NHUT57;database=BIDs;uid=sa;pwd=05072001;TrustServerCertificate=True");
+                optionsBuilder.UseSqlServer("server =MINHNHUT\\NHUT57; database = BIDs;uid=sa;pwd=05072001;");
+            }
+        }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<BanHistory>(entity =>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            entity.HasKey(e => e.BanId);
+            modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
-            entity.ToTable("BanHistory");
+            modelBuilder.Entity<BanHistory>(entity =>
+            {
+                entity.HasKey(e => e.BanId)
+                    .HasName("PK__BanHisto__991CE7658EA68D98");
 
-            entity.Property(e => e.BanId)
-                .ValueGeneratedNever()
-                .HasColumnName("BanID");
-            entity.Property(e => e.CreateDate).HasColumnType("datetime");
-            entity.Property(e => e.Reason).IsRequired();
-            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
+                entity.ToTable("BanHistory");
 
-            entity.HasOne(d => d.User).WithMany(p => p.BanHistories)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_BanHistory_User");
-        });
+                entity.Property(e => e.BanId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("BanID");
 
-        modelBuilder.Entity<BidderPrice>(entity =>
-        {
-            entity.HasKey(e => new { e.ItemId, e.UserId });
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
 
-            entity.ToTable("BidderPrice");
+                entity.Property(e => e.Reason)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
-            entity.Property(e => e.ItemId).HasColumnName("ItemID");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
-            entity.Property(e => e.CreateDate).HasColumnType("datetime");
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
-            entity.HasOne(d => d.Item).WithMany(p => p.BidderPrices)
-                .HasForeignKey(d => d.ItemId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_BidderPrice_Item");
+                entity.Property(e => e.UserId).HasColumnName("UserID");
 
-            entity.HasOne(d => d.User).WithMany(p => p.BidderPrices)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_BidderPrice_User");
-        });
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.BanHistories)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_BanHistory_User");
+            });
 
-        modelBuilder.Entity<Item>(entity =>
-        {
-            entity.ToTable("Item");
+            modelBuilder.Entity<Item>(entity =>
+            {
+                entity.ToTable("Item");
 
-            entity.Property(e => e.ItemId)
-                .ValueGeneratedNever()
-                .HasColumnName("ItemID");
-            entity.Property(e => e.CreateDate).HasColumnType("datetime");
-            entity.Property(e => e.Description).IsRequired();
-            entity.Property(e => e.Image)
-                .IsRequired()
-                .HasColumnType("image");
-            entity.Property(e => e.ItemName)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.ItemTypeId).HasColumnName("ItemTypeID");
-            entity.Property(e => e.SessionId).HasColumnName("SessionID");
-            entity.Property(e => e.StaffId).HasColumnName("StaffID");
-            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
+                entity.Property(e => e.ItemId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ItemID");
 
-            entity.HasOne(d => d.ItemType).WithMany(p => p.Items)
-                .HasForeignKey(d => d.ItemTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Item_ItemType");
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
 
-            entity.HasOne(d => d.Session).WithMany(p => p.Items)
-                .HasForeignKey(d => d.SessionId)
-                .HasConstraintName("FK_Item_Session");
+                entity.Property(e => e.Image).IsRequired();
 
-            entity.HasOne(d => d.Staff).WithMany(p => p.Items)
-                .HasForeignKey(d => d.StaffId)
-                .HasConstraintName("FK_Item_Staff");
+                entity.Property(e => e.ItemName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
-            entity.HasOne(d => d.User).WithMany(p => p.Items)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Item_User");
-        });
+                entity.Property(e => e.ItemTypeId).HasColumnName("ItemTypeID");
 
-        modelBuilder.Entity<ItemType>(entity =>
-        {
-            entity.ToTable("ItemType");
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
-            entity.Property(e => e.ItemTypeId)
-                .ValueGeneratedNever()
-                .HasColumnName("ItemTypeID");
-            entity.Property(e => e.CreateDate).HasColumnType("datetime");
-            entity.Property(e => e.ItemTypeName)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-        });
+                entity.Property(e => e.UserId).HasColumnName("UserID");
 
-        modelBuilder.Entity<Payment>(entity =>
-        {
-            entity.ToTable("Payment");
+                entity.HasOne(d => d.ItemType)
+                    .WithMany(p => p.Items)
+                    .HasForeignKey(d => d.ItemTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Item_ItemType");
 
-            entity.Property(e => e.PaymentId)
-                .ValueGeneratedNever()
-                .HasColumnName("PaymentID");
-            entity.Property(e => e.CreateDate).HasColumnType("datetime");
-            entity.Property(e => e.Detail)
-                .IsRequired()
-                .HasMaxLength(100);
-            entity.Property(e => e.ItemId).HasColumnName("ItemID");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Items)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Item_User");
+            });
 
-            entity.HasOne(d => d.Item).WithMany(p => p.Payments)
-                .HasForeignKey(d => d.ItemId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Payment_Item");
+            modelBuilder.Entity<ItemType>(entity =>
+            {
+                entity.ToTable("ItemType");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Payments)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Payment_User");
-        });
+                entity.Property(e => e.ItemTypeId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ItemTypeID");
 
-        modelBuilder.Entity<Role>(entity =>
-        {
-            entity.ToTable("Role");
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
 
-            entity.Property(e => e.RoleId)
-                .ValueGeneratedNever()
-                .HasColumnName("RoleID");
-            entity.Property(e => e.RoleName)
-                .IsRequired()
-                .HasMaxLength(50);
-        });
+                entity.Property(e => e.ItemTypeName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
-        modelBuilder.Entity<Session>(entity =>
-        {
-            entity.ToTable("Session");
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            });
 
-            entity.Property(e => e.SessionId)
-                .ValueGeneratedNever()
-                .HasColumnName("SessionID");
-            entity.Property(e => e.BeginTime).HasColumnType("datetime");
-            entity.Property(e => e.CreateDate).HasColumnType("datetime");
-            entity.Property(e => e.EndTime).HasColumnType("datetime");
-            entity.Property(e => e.ItemTypeId).HasColumnName("ItemTypeID");
-            entity.Property(e => e.SessionName)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.ToTable("Payment");
 
-            entity.HasOne(d => d.ItemType).WithMany(p => p.Sessions)
-                .HasForeignKey(d => d.ItemTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Session_ItemType");
-        });
+                entity.Property(e => e.PaymentId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("PaymentID");
 
-        modelBuilder.Entity<Staff>(entity =>
-        {
-            entity.Property(e => e.StaffId)
-                .ValueGeneratedNever()
-                .HasColumnName("StaffID");
-            entity.Property(e => e.AccountName)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.Address)
-                .IsRequired()
-                .HasMaxLength(100);
-            entity.Property(e => e.CreateDate).HasColumnType("datetime");
-            entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
-            entity.Property(e => e.Email)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.Password)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.Phone)
-                .IsRequired()
-                .HasMaxLength(20);
-            entity.Property(e => e.RoleId).HasColumnName("RoleID");
-            entity.Property(e => e.StaffName)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+                entity.Property(e => e.Date).HasColumnType("datetime");
 
-            entity.HasOne(d => d.Role).WithMany(p => p.Staff)
-                .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Staff_Role");
-        });
+                entity.Property(e => e.Detail)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.ToTable("User");
+                entity.Property(e => e.ItemId).HasColumnName("ItemID");
 
-            entity.Property(e => e.UserId)
-                .ValueGeneratedNever()
-                .HasColumnName("UserID");
-            entity.Property(e => e.AccountName)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.Address)
-                .IsRequired()
-                .HasMaxLength(100);
-            entity.Property(e => e.CccdbackImage)
-                .IsRequired()
-                .HasColumnType("image")
-                .HasColumnName("CCCDBackImage");
-            entity.Property(e => e.CccdfrontImage)
-                .IsRequired()
-                .HasColumnType("image")
-                .HasColumnName("CCCDFrontImage");
-            entity.Property(e => e.Cccdnumber)
-                .IsRequired()
-                .HasMaxLength(20)
-                .HasColumnName("CCCDNumber");
-            entity.Property(e => e.CreateDate).HasColumnType("datetime");
-            entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
-            entity.Property(e => e.Email)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.Password)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.Phone)
-                .IsRequired()
-                .HasMaxLength(20);
-            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-            entity.Property(e => e.UserName)
-                .IsRequired()
-                .HasMaxLength(50);
-        });
+                entity.Property(e => e.UserId).HasColumnName("UserID");
 
-        OnModelCreatingPartial(modelBuilder);
+                entity.HasOne(d => d.Item)
+                    .WithMany(p => p.Payments)
+                    .HasForeignKey(d => d.ItemId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Payment_Item");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Payments)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Payment_User");
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.ToTable("Role");
+
+                entity.Property(e => e.RoleId).HasColumnName("RoleID");
+
+                entity.Property(e => e.RoleName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Session>(entity =>
+            {
+                entity.ToTable("Session");
+
+                entity.Property(e => e.SessionId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("SessionID");
+
+                entity.Property(e => e.AuctionTime).HasColumnType("datetime");
+
+                entity.Property(e => e.BeginTime).HasColumnType("datetime");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.EndTime).HasColumnType("datetime");
+
+                entity.Property(e => e.ItemId).HasColumnName("ItemID");
+
+                entity.Property(e => e.SessionName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Item)
+                    .WithMany(p => p.Sessions)
+                    .HasForeignKey(d => d.ItemId)
+                    .HasConstraintName("FK_Session_Item");
+            });
+
+            modelBuilder.Entity<SessionDetail>(entity =>
+            {
+                entity.ToTable("SessionDetail");
+
+                entity.Property(e => e.SessionDetailId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("SessionDetailID");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.SessionId).HasColumnName("SessionID");
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.Session)
+                    .WithMany(p => p.SessionDetails)
+                    .HasForeignKey(d => d.SessionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SessionDetail_Session");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.SessionDetails)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SessionDetail_User");
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("User");
+
+                entity.Property(e => e.UserId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("UserID");
+
+                entity.Property(e => e.AccountName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Address)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CccdbackImage)
+                    .IsRequired()
+                    .HasColumnName("CCCDBackImage");
+
+                entity.Property(e => e.CccdfrontImage)
+                    .IsRequired()
+                    .HasColumnName("CCCDFrontImage");
+
+                entity.Property(e => e.Cccdnumber)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnName("CCCDNumber");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
+
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Notification).IsRequired();
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Phone)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Staff>(entity =>
+            {
+                entity.ToTable("Staff");
+
+                entity.Property(e => e.StaffId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("StaffID");
+
+                entity.Property(e => e.AccountName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Address)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
+
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Notification).IsRequired();
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Phone)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.RoleId).HasColumnName("RoleID");
+
+                entity.Property(e => e.StaffName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.Staff)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Staff_Role");
+            });
+
+            OnModelCreatingPartial(modelBuilder);
+        }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

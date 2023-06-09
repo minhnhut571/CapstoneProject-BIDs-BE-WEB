@@ -74,7 +74,7 @@ namespace Business_Logic.Modules.LoginModule
 
 
                 string _gmail = "bidauctionfloor@gmail.com";
-                string _password = "auctionfloor123";
+                string _password = "gnauvhbfubtgxjow";
                 string randomPassword = RandomString(10);
 
                 string sendto = email;
@@ -131,6 +131,35 @@ namespace Business_Logic.Modules.LoginModule
                 builder.Append(ch);
             }
             return builder.ToString();
+        }
+
+        public async Task sendemail(string email)
+        {
+            string _gmail = "bidauctionfloor@gmail.com";
+            string _password = "gnauvhbfubtgxjow";
+
+            string sendto = email;
+            string subject = "[BIDs] - Khôi phục mật khẩu";
+
+            string content = "abc";
+
+            MailMessage mail = new MailMessage();
+            SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+
+            mail.From = new MailAddress(_gmail);
+            mail.To.Add(email);
+            mail.Subject = subject;
+            mail.IsBodyHtml = true;
+            mail.Body = content;
+
+            mail.Priority = MailPriority.High;
+
+            SmtpServer.Port = 587;
+            SmtpServer.UseDefaultCredentials = false;
+            SmtpServer.Credentials = new NetworkCredential(_gmail, _password);
+            SmtpServer.EnableSsl = true;
+
+            SmtpServer.Send(mail);
         }
     }
 }

@@ -13,9 +13,9 @@ namespace Business_Logic.Modules.SessionModule
 {
     public class SessionRepository : Repository<Session>, ISessionRepository
     {
-        private readonly BidsContext _db;
+        private readonly BIDsContext _db;
 
-        public SessionRepository(BidsContext db) : base(db)
+        public SessionRepository(BIDsContext db) : base(db)
         {
             _db = db;
         }

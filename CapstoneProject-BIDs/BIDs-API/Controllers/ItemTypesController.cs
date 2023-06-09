@@ -6,30 +6,30 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Data_Access.Entities;
-using Business_Logic.Modules.RoleModule.Interface;
-using Business_Logic.Modules.RoleModule.Request;
+using Business_Logic.Modules.ItemTypeModule.Interface;
+using Business_Logic.Modules.ItemTypeModule.Request;
 
 namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RolesController : ControllerBase
+    public class ItemTypesController : ControllerBase
     {
-        private readonly IRoleService _RoleService;
+        private readonly IItemTypeService _ItemTypeService;
 
-        public RolesController(IRoleService RoleService)
+        public ItemTypesController(IItemTypeService ItemTypeService)
         {
-            _RoleService = RoleService;
+            _ItemTypeService = ItemTypeService;
         }
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Role>>> GetRolesForAdmin()
+        public async Task<ActionResult<IEnumerable<ItemType>>> GetItemTypesForAdmin()
         {
             try
             {
-                var response = await _RoleService.GetAll();
-                if(response == null)
+                var response = await _ItemTypeService.GetAll();
+                if (response == null)
                 {
                     return NotFound();
                 }
@@ -43,40 +43,40 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Role>> GetRoleByID([FromRoute] int id)
+        public async Task<ActionResult<ItemType>> GetItemTypeByID([FromRoute] Guid? id)
         {
-            var Role = await _RoleService.GetRoleByID(id);
+            var ItemType = await _ItemTypeService.GetItemTypeByID(id);
 
-            if (Role == null)
+            if (ItemType == null)
             {
                 return NotFound();
             }
 
-            return Role;
+            return ItemType;
         }
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_name/{name}")]
-        public async Task<ActionResult<Role>> GetRoleByName([FromRoute] string name)
+        public async Task<ActionResult<ItemType>> GetItemTypeByName([FromRoute] string name)
         {
-            var Role = await _RoleService.GetRoleByName(name);
+            var ItemType = await _ItemTypeService.GetItemTypeByName(name);
 
-            if (Role == null)
+            if (ItemType == null)
             {
                 return NotFound();
             }
 
-            return Role;
+            return ItemType;
         }
 
         // PUT api/<ValuesController>/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutRole([FromBody] UpdateRoleRequest updateRoleRequest)
+        public async Task<IActionResult> PutItemType([FromBody] UpdateItemTypeRequest updateItemTypeRequest)
         {
             try
             {
-                await _RoleService.UpdateRole(updateRoleRequest);
+                await _ItemTypeService.UpdateItemType(updateItemTypeRequest);
                 return Ok();
             }
             catch (Exception ex)
@@ -88,11 +88,11 @@ namespace BIDs_API.Controllers
         // POST api/<ValuesController>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Role>> PostRole([FromBody] CreateRoleRequest createRoleRequest)
+        public async Task<ActionResult<ItemType>> PostItemType([FromBody] CreateItemTypeRequest createItemTypeRequest)
         {
             try
             {
-                return Ok(await _RoleService.AddNewRole(createRoleRequest));
+                return Ok(await _ItemTypeService.AddNewItemType(createItemTypeRequest));
             }
             catch (Exception ex)
             {
@@ -102,11 +102,11 @@ namespace BIDs_API.Controllers
 
         // DELETE api/<ValuesController>/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRole([FromRoute] int id)
+        public async Task<IActionResult> DeleteItemType([FromRoute] Guid? id)
         {
             try
             {
-                await _RoleService.DeleteRole(id);
+                await _ItemTypeService.DeleteItemType(id);
                 return Ok();
             }
             catch (Exception ex)

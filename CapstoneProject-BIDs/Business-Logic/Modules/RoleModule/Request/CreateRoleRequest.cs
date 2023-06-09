@@ -5,11 +5,7 @@ namespace Business_Logic.Modules.RoleModule.Request
 {
     public class CreateRoleRequest
     {
-        //public Guid RoleId { get; set; }
-
         public string RoleName { get; set; }
-
-        //public bool Status { get; set; }
     }
     public class CreateRoleRequestValidator : AbstractValidator<CreateRoleRequest>
     {

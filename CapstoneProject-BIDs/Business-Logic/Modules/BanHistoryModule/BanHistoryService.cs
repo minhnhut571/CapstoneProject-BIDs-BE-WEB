@@ -1,5 +1,6 @@
 ﻿using Business_Logic.Modules.BanHistoryModule.Interface;
 using Business_Logic.Modules.BanHistoryModule.Request;
+using Business_Logic.Modules.StaffModule.Interface;
 using Business_Logic.Modules.UserModule.Interface;
 using Data_Access.Constant;
 using Data_Access.Entities;
@@ -10,11 +11,13 @@ namespace Business_Logic.Modules.BanHistoryModule
     public class BanHistoryService : IBanHistoryService
     {
         private readonly IBanHistoryRepository _BanHistoryRepository;
-        private readonly IUserRepository _UserRepository;
-        public BanHistoryService(IBanHistoryRepository BanHistoryRepository, IUserRepository UserRepository)
+        private readonly IUserService _UserService;
+        private readonly IStaffService _StaffService;
+        public BanHistoryService(IBanHistoryRepository BanHistoryRepository, IUserService UserService, IStaffService StaffService)
         {
             _BanHistoryRepository = BanHistoryRepository;
-            _UserRepository = UserRepository;
+            _UserService = UserService;
+            _StaffService = StaffService;
         }
 
         public async Task<ICollection<BanHistory>> GetAll()
@@ -47,8 +50,8 @@ namespace Business_Logic.Modules.BanHistoryModule
             {
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
-            var user = _UserRepository.GetFirstOrDefaultAsync(x => x.UserName == userName).Result;
-            var BanHistory = await _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.UserId == user.UserId);
+            User user = await _UserService.GetUserByName(userName);
+            BanHistory BanHistory = await _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.UserId == user.UserId);
             if (BanHistory == null)
             {
                 throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
@@ -75,6 +78,7 @@ namespace Business_Logic.Modules.BanHistoryModule
             newBanHistory.Status = true;
 
             await _BanHistoryRepository.AddAsync(newBanHistory);
+            await _StaffService.BanUser(newBanHistory.BanId);
             return newBanHistory.BanId;
         }
 
@@ -109,31 +113,34 @@ namespace Business_Logic.Modules.BanHistoryModule
 
         }
 
-        public async Task DeleteBanHistory(Guid? BanHistoryDeleteID)
-        {
-            try
-            {
-                if (BanHistoryDeleteID == null)
-                {
-                    throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
-                }
+        //public async Task DeleteBanHistory(Guid? BanHistoryDeleteID)
+        //{
+        //    try
+        //    {
+        //        if (BanHistoryDeleteID == null)
+        //        {
+        //            throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
+        //        }
 
-                BanHistory BanHistoryDelete = _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.BanId == BanHistoryDeleteID && x.Status == true).Result;
+        //        BanHistory BanHistoryDelete = _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.BanId == BanHistoryDeleteID && x.Status == true).Result;
 
-                if (BanHistoryDelete == null)
-                {
-                    throw new Exception(ErrorMessage.BanHistoryError.BAN_HISTORY_NOT_FOUND);
-                }
+        //        if (BanHistoryDelete == null)
+        //        {
+        //            throw new Exception(ErrorMessage.BanHistoryError.BAN_HISTORY_NOT_FOUND);
+        //        }
 
-                BanHistoryDelete.Status = false;
-                await _BanHistoryRepository.UpdateAsync(BanHistoryDelete);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error at delete type: " + ex.Message);
-                throw new Exception(ex.Message);
-            }
-        }
+        //        BanHistoryDelete.Status = false;
+
+        //        await _StaffService.UnbanUser(_UserService.);
+
+        //        await _BanHistoryRepository.UpdateAsync(BanHistoryDelete);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("Error at delete type: " + ex.Message);
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
     }
 }

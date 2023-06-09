@@ -6,7 +6,6 @@ namespace Business_Logic.Modules.BanHistoryModule.Request
     public class CreateBanHistoryRequest
     {
         public Guid UserId { get; set; }
-
         public string Reason { get; set; }
     }
     public class CreateBanHistoryRequestValidator : AbstractValidator<CreateBanHistoryRequest>

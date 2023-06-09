@@ -1,29 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-namespace Data_Access.Entities;
+#nullable disable
 
-public partial class Session
+namespace Data_Access.Entities
 {
-    public Guid SessionId { get; set; }
+    public partial class Session
+    {
+        public Session()
+        {
+            SessionDetails = new HashSet<SessionDetail>();
+        }
 
-    public string SessionName { get; set; }
+        public Guid SessionId { get; set; }
+        [Required]
+        public Guid? ItemId { get; set; }
+        public string SessionName { get; set; }
+        public DateTime BeginTime { get; set; }
+        public DateTime AuctionTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public double? FinailPrice { get; set; }
+        public DateTime UpdateDate { get; set; }
+        public DateTime CreateDate { get; set; }
+        public int Status { get; set; }
 
-    public Guid ItemTypeId { get; set; }
-
-    public DateTime BeginTime { get; set; }
-
-    public int AuctionTime { get; set; }
-
-    public DateTime EndTime { get; set; }
-
-    public DateTime UpdateDate { get; set; }
-
-    public DateTime CreateDate { get; set; }
-
-    public bool Status { get; set; }
-
-    public virtual ItemType ItemType { get; set; }
-
-    public virtual ICollection<Item> Items { get; } = new List<Item>();
+        public virtual Item Item { get; set; }
+        public virtual ICollection<SessionDetail> SessionDetails { get; set; }
+    }
 }

@@ -13,9 +13,9 @@ namespace Business_Logic.Modules.RoleModule
 {
     public class RoleRepository : Repository<Role>, IRoleRepository
     {
-        private readonly BidsContext _db;
+        private readonly BIDsContext _db;
 
-        public RoleRepository(BidsContext db) : base(db)
+        public RoleRepository(BIDsContext db) : base(db)
         {
             _db = db;
         }

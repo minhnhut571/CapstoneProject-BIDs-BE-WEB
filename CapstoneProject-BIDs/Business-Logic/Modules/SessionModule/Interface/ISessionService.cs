@@ -22,5 +22,11 @@ namespace Business_Logic.Modules.SessionModule.Interface
 
         public Task<Session> GetSessionByName(string Name);
 
+        public Task<ICollection<Session>> GetSessionsIsNotStart();
+
+        public Task<ICollection<Session>> GetSessionsIsInStage();
+
+        public Task<ICollection<Session>> GetSessionsIsComplete();
+
     }
 }

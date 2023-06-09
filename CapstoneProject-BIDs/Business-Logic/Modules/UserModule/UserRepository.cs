@@ -13,9 +13,9 @@ namespace Business_Logic.Modules.UserModule
 {
     public class UserRepository : Repository<User>, IUserRepository
     {
-        private readonly BidsContext _db;
+        private readonly BIDsContext _db;
 
-        public UserRepository(BidsContext db) : base(db)
+        public UserRepository(BIDsContext db) : base(db)
         {
             _db = db;
         }

@@ -13,9 +13,9 @@ namespace Business_Logic.Modules.ItemTypeModule
 {
     public class ItemTypeRepository : Repository<ItemType>, IItemTypeRepository
     {
-        private readonly BidsContext _db;
+        private readonly BIDsContext _db;
 
-        public ItemTypeRepository(BidsContext db) : base(db)
+        public ItemTypeRepository(BIDsContext db) : base(db)
         {
             _db = db;
         }

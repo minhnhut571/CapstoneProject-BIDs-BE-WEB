@@ -1,7 +1,13 @@
+using Business_Logic.Modules.BanHistoryModule;
+using Business_Logic.Modules.BanHistoryModule.Interface;
+using Business_Logic.Modules.ItemTypeModule;
+using Business_Logic.Modules.ItemTypeModule.Interface;
 using Business_Logic.Modules.LoginModule;
 using Business_Logic.Modules.LoginModule.InterFace;
 using Business_Logic.Modules.RoleModule;
 using Business_Logic.Modules.RoleModule.Interface;
+using Business_Logic.Modules.SessionModule;
+using Business_Logic.Modules.SessionModule.Interface;
 using Business_Logic.Modules.StaffModule;
 using Business_Logic.Modules.StaffModule.Interface;
 using Business_Logic.Modules.UserModule;
@@ -30,7 +36,7 @@ namespace BIDs_API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BIDs", Version = "v1" });
             });
-            services.AddDbContext<BidsContext>(
+            services.AddDbContext<BIDsContext>(
                 opt => opt.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")
                 )
@@ -45,6 +51,15 @@ namespace BIDs_API
             //Role Module
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IRoleService, RoleService>();
+            //Role Module
+            services.AddScoped<IBanHistoryRepository, BanHistoryRepository>();
+            services.AddScoped<IBanHistoryService, BanHistoryService>();
+            //Role Module
+            services.AddScoped<IItemTypeRepository, ItemTypeRepository>();
+            services.AddScoped<IItemTypeService, ItemTypeService>();
+            //Role Module
+            services.AddScoped<ISessionRepository, SessionRepository>();
+            services.AddScoped<ISessionService, SessionService>();
             //Login Module
             services.AddScoped<ILoginService, LoginService>();
         }

@@ -13,9 +13,9 @@ namespace Business_Logic.Modules.StaffModule
 {
     public class StaffRepository : Repository<Staff>, IStaffRepository
     {
-        private readonly BidsContext _db;
+        private readonly BIDsContext _db;
 
-        public StaffRepository(BidsContext db) : base(db)
+        public StaffRepository(BIDsContext db) : base(db)
         {
             _db = db;
         }
