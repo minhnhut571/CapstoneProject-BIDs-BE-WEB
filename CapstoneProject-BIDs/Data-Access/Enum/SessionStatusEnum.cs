@@ -10,7 +10,9 @@ namespace Data_Access.Enum
     {
         NotStart = 1,
         InStage = 2,
-        Complete = 3,
+        HaventTranferYet = 3,
+        Complete = 4,
+        OutOfDate = 5,
         Delete = -1
     }
 }

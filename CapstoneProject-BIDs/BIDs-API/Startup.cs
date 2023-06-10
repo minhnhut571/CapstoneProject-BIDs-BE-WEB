@@ -1,9 +1,13 @@
 using Business_Logic.Modules.BanHistoryModule;
 using Business_Logic.Modules.BanHistoryModule.Interface;
+using Business_Logic.Modules.ItemModule;
+using Business_Logic.Modules.ItemModule.Interface;
 using Business_Logic.Modules.ItemTypeModule;
 using Business_Logic.Modules.ItemTypeModule.Interface;
 using Business_Logic.Modules.LoginModule;
 using Business_Logic.Modules.LoginModule.InterFace;
+using Business_Logic.Modules.PaymentModule;
+using Business_Logic.Modules.PaymentModule.Interface;
 using Business_Logic.Modules.RoleModule;
 using Business_Logic.Modules.RoleModule.Interface;
 using Business_Logic.Modules.SessionModule;
@@ -60,6 +64,12 @@ namespace BIDs_API
             //Role Module
             services.AddScoped<ISessionRepository, SessionRepository>();
             services.AddScoped<ISessionService, SessionService>();
+            //Role Module
+            services.AddScoped<IItemRepository, ItemRepository>();
+            services.AddScoped<IItemService, ItemService>();
+            //Role Module
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IPaymentService, PaymentService>();
             //Login Module
             services.AddScoped<ILoginService, LoginService>();
         }

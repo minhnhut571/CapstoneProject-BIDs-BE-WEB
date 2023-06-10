@@ -5,42 +5,42 @@
         #region Common error message
         public static class CommonError
         {
-            public readonly static string NAME_IS_NULL = "Name request is null";
-            public readonly static string ID_IS_NULL = "ID request is null";
-            public readonly static string INVALID_REQUEST = "Request is not valid";
-            public readonly static string ACCOUNT_NAME_IS_EXITED = "Account name is exited";
-            public readonly static string EMAIL_IS_EXITED = "Email is exited";
-            public readonly static string WRONG_EMAIL_FORMAT = "Wrong email format";
-            public readonly static string CCCD_NUMBER_IS_EXITED = "CCCD number is exited";
-            public readonly static string WRONG_CCCD_NUMBER_FORMAT = "Wrong cccd number format";
-            public readonly static string PHONE_IS_EXITED = "Phone is exited";
-            public readonly static string WRONG_PHONE_FORMAT = "Wrong phone format";
-            public readonly static string EMAIL_IS_NULL = "Email request is null";
+            public readonly static string NAME_IS_NULL = "Tên trồng(vui lòng nhập tên)";
+            public readonly static string ID_IS_NULL = "ID trống(Vui lòng nhập ID)";
+            public readonly static string INVALID_REQUEST = "Yêu cầu không hợp lệ";
+            public readonly static string ACCOUNT_NAME_IS_EXITED = "Tài khoản đã tồn tại";
+            public readonly static string EMAIL_IS_EXITED = "Email Đã tồn tại";
+            public readonly static string WRONG_EMAIL_FORMAT = "Email sai định dạng";
+            public readonly static string CCCD_NUMBER_IS_EXITED = "Số CCCD đã tồn tại";
+            public readonly static string WRONG_CCCD_NUMBER_FORMAT = "Số CCCD sai định dạng";
+            public readonly static string PHONE_IS_EXITED = "Số điện thoại đã tồn tại";
+            public readonly static string WRONG_PHONE_FORMAT = "Số điện thoại sai định dạng";
+            public readonly static string EMAIL_IS_NULL = "Email trống(vui lòng nhập email)";
         }
         #endregion
 
         #region User error message
         public static class UserError
         {
-            public readonly static string USER_NOT_FOUND = "User is not existed";
-            public readonly static string USER_EXISTED = "User is existed";
-            public readonly static string ACCOUNT_CREATE_NOT_FOUND = "Account create is not existed";
+            public readonly static string USER_NOT_FOUND = "Người dùng không tồn tại";
+            public readonly static string USER_EXISTED = "Người dùng đã tồn tại";
+            public readonly static string ACCOUNT_CREATE_NOT_FOUND = "Tài khoản khởi tạo không tồn tại";
         }
         #endregion
 
         #region Staff error message
         public static class StaffError
         {
-            public readonly static string STAFF_NOT_FOUND = "Staff is not existed";
-            public readonly static string STAFF_EXISTED = "Staff is existed";
+            public readonly static string STAFF_NOT_FOUND = "Nhân viên không tồn tại";
+            public readonly static string STAFF_EXISTED = "Nhân viên đã tồn tại";
         }
         #endregion
 
         #region Role error message
         public static class RoleError
         {
-            public readonly static string ROLE_NOT_FOUND = "Role is not existed";
-            public readonly static string ROLE_EXISTED = "Role is existed";
+            public readonly static string ROLE_NOT_FOUND = "Quyền không tài tại";
+            public readonly static string ROLE_EXISTED = "Quyền đã tồn tại";
         }
         #endregion
 
@@ -54,23 +54,40 @@
         #region ItemType error message
         public static class ItemTypeError
         {
-            public readonly static string ITEM_TYPE_NOT_FOUND = "ItemType is not existed";
-            public readonly static string ITEM_TYPE_EXISTED = "ItemType is existed";
+            public readonly static string ITEM_TYPE_NOT_FOUND = "Loại sản phẩm không tồn tại";
+            public readonly static string ITEM_TYPE_EXISTED = "Loại sản phẩm đã tồn tài";
         }
         #endregion
 
         #region Session error message
         public static class SessionError
         {
-            public readonly static string SESSION_NOT_FOUND = "Session is not existed";
-            public readonly static string SESSION_EXISTED = "Session is existed";
+            public readonly static string SESSION_NOT_FOUND = "Phiên đấu giá không tồn tại";
+            public readonly static string SESSION_EXISTED = "Phiên đấu giá đã tồn tại";
         }
         #endregion
 
         #region Ban History error message
         public static class BanHistoryError
         {
-            public readonly static string BAN_HISTORY_NOT_FOUND = "Ban History is not existed";
+            public readonly static string BAN_HISTORY_NOT_FOUND = "Lịch sử tài khoản khóa không tồn tại";
+        }
+        #endregion
+
+        #region Item error message
+        public static class ItemError
+        {
+            public readonly static string ITEM_NOT_FOUND = "Sản phẩm không tồn tại";
+            public readonly static string ITEM_EXISTED = "Sản phẩm đã tồn tại";
+            public readonly static string INVALID_STEP_PRICE = "Bước giá không hợp lệ(5-10% giá khởi điểm)";
+        }
+        #endregion
+
+        #region Payment error message
+        public static class PaymentError
+        {
+            public readonly static string PAYMENT_NOT_FOUND = "Đơn thanh toán không tồn tại";
+            public readonly static string PAYMENT_EXISTED = "Đơn thanh toán đã tồn tại";
         }
         #endregion
     }
