@@ -10,6 +10,12 @@ using FluentValidation.Results;
 using System.Net.Mail;
 using System.Net;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using Business_Logic.Modules.LoginModule.Data;
 
 namespace Business_Logic.Modules.LoginModule
 {
@@ -18,13 +24,15 @@ namespace Business_Logic.Modules.LoginModule
         private readonly IUserRepository _UserRepository;
         private readonly IStaffRepository _StaffRepository;
         private readonly IRoleRepository _RoleRepository;
-        public LoginService(IUserRepository UserRepository, IStaffRepository StaffRepository, IRoleRepository RoleRepository)
+        public LoginService(IUserRepository UserRepository
+            , IStaffRepository StaffRepository
+            , IRoleRepository RoleRepository)
         {
             _UserRepository = UserRepository;
             _StaffRepository = StaffRepository;
             _RoleRepository = RoleRepository;
         }
-        public async Task<string> Login(LoginRequest loginRequest)
+        public bool LoginUser(LoginRequest loginRequest)
         {
             ValidationResult result = new LoginRequestValidator().Validate(loginRequest);
             if (!result.IsValid)
@@ -32,26 +40,32 @@ namespace Business_Logic.Modules.LoginModule
                 throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
             }
 
-            User UserCheckLogin =  _UserRepository.GetFirstOrDefaultAsync(x => x.AccountName == loginRequest.AccountName
+            var UserCheckLogin =  _UserRepository.GetFirstOrDefaultAsync(x => x.AccountName == loginRequest.AccountName
             && x.Password == loginRequest.Password).Result;
 
-            Staff StaffCheckLogin = _StaffRepository.GetFirstOrDefaultAsync(x => x.AccountName == loginRequest.AccountName
-            && x.Password == loginRequest.Password).Result;
-
-            if(UserCheckLogin == null && StaffCheckLogin == null)
+            if (UserCheckLogin == null )
             {
                 throw new Exception(ErrorMessage.LoginError.WRONG_ACCOUNT_NAME_OR_PASSWORD);
             }
+            return true;
+        }
 
-            if(UserCheckLogin != null)
+        public Staff LoginStaff(LoginRequest loginRequest)
+        {
+            ValidationResult result = new LoginRequestValidator().Validate(loginRequest);
+            if (!result.IsValid)
             {
-                return "Login successfull with user";
+                throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
             }
-            else
+
+            var StaffCheckLogin = _StaffRepository.GetFirstOrDefaultAsync(x => x.AccountName == loginRequest.AccountName
+            && x.Password == loginRequest.Password).Result;
+
+            if (StaffCheckLogin == null)
             {
-                Role getRole =  _RoleRepository.GetFirstOrDefaultAsync(x => x.RoleId == StaffCheckLogin.RoleId).Result;
-                return "Login successfull with role " + getRole.RoleName;
+                throw new Exception(ErrorMessage.LoginError.WRONG_ACCOUNT_NAME_OR_PASSWORD);
             }
+            return StaffCheckLogin;
         }
 
         public async Task ResetPassword(string email)
@@ -161,5 +175,61 @@ namespace Business_Logic.Modules.LoginModule
 
             SmtpServer.Send(mail);
         }
+
+        //public async Task<TokenModel> GenerateToken(LoginRespone account)
+        //{
+        //    var jwtToken = new JwtSecurityTokenHandler();
+        //    var secretKeyByte = Encoding.UTF8.GetBytes(_appsetting.SecretKey);
+        //    //token for user
+        //    var tokenDescription = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(new[]
+        //         {
+        //            new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+
+        //            new Claim("AccountID", string.Join(",", account.AccountID)),
+        //        }),
+        //        Expires = DateTime.UtcNow.AddHours(2),
+        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeyByte),
+        //            SecurityAlgorithms.HmacSha512Signature)
+        //    };
+
+
+        //    //create Token
+        //    var token = jwtToken.CreateToken(tokenDescription);
+        //    var accessToken = jwtToken.WriteToken(token);
+        //    return new TokenModel
+        //    {
+        //        AccessToken = accessToken
+        //    };
+
+        //}
+        //private string GenerateRefeshToken()
+        //{
+        //    var random = new Byte[32];
+        //    using (var rng = RandomNumberGenerator.Create())
+        //    {
+        //        rng.GetBytes(random);
+        //        string token = Convert.ToBase64String(random);
+        //        return token;
+        //    }
+        //}
+        ////giải mã token
+        //public ClaimsPrincipal EncrypToken(string token)
+        //{
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    //Decode JWT
+        //    var claims = tokenHandler.ValidateToken(token, new TokenValidationParameters
+        //    {
+        //        ValidateIssuerSigningKey = true,
+        //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appsetting.SecretKey)),
+        //        ValidateIssuer = false,
+        //        ValidateAudience = false,
+        //        ClockSkew = TimeSpan.Zero
+        //    }, out SecurityToken validatedToken);
+        //    //Access the claim 
+        //    return claims;
+        //}
+
     }
 }

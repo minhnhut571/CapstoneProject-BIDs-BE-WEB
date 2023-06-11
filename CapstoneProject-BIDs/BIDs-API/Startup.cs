@@ -17,8 +17,12 @@ using Business_Logic.Modules.StaffModule.Interface;
 using Business_Logic.Modules.UserModule;
 using Business_Logic.Modules.UserModule.Interface;
 using Data_Access.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace BIDs_API
 {
@@ -46,6 +50,21 @@ namespace BIDs_API
                 )
             );
             
+            //services.AddIdentity<Staff, Role>()
+            //    .AddEntityFrameworkStores<BIDsContext>()
+            //    .AddDefaultTokenProviders(); ;
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(otp =>
+                {
+                    otp.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"])),
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
             //User Module
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
@@ -87,6 +106,8 @@ namespace BIDs_API
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
