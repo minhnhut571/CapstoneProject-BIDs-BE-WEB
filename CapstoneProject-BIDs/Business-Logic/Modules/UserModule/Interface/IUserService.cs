@@ -26,5 +26,7 @@ namespace Business_Logic.Modules.UserModule.Interface
 
         public Task<User> GetUserByName(string Name);
 
+        public Task<User> GetUserByAccountName(string Name);
+
     }
 }

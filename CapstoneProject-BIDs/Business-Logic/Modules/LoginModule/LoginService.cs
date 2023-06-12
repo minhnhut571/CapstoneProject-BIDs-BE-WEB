@@ -16,6 +16,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Business_Logic.Modules.LoginModule.Data;
+using Microsoft.Extensions.Configuration;
 
 namespace Business_Logic.Modules.LoginModule
 {
@@ -24,13 +25,16 @@ namespace Business_Logic.Modules.LoginModule
         private readonly IUserRepository _UserRepository;
         private readonly IStaffRepository _StaffRepository;
         private readonly IRoleRepository _RoleRepository;
+        private readonly IConfiguration _configuration;
         public LoginService(IUserRepository UserRepository
             , IStaffRepository StaffRepository
-            , IRoleRepository RoleRepository)
+            , IRoleRepository RoleRepository
+            , IConfiguration configuration)
         {
             _UserRepository = UserRepository;
             _StaffRepository = StaffRepository;
             _RoleRepository = RoleRepository;
+            _configuration = configuration;
         }
         public bool LoginUser(LoginRequest loginRequest)
         {
@@ -66,6 +70,22 @@ namespace Business_Logic.Modules.LoginModule
                 throw new Exception(ErrorMessage.LoginError.WRONG_ACCOUNT_NAME_OR_PASSWORD);
             }
             return StaffCheckLogin;
+        }
+
+        public ClaimsPrincipal EncrypToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            //Decode JWT
+            var claims = tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecurityKey"])),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+            //Access the claim 
+            return claims;
         }
 
         public async Task ResetPassword(string email)

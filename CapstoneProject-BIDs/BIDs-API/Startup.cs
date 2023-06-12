@@ -1,4 +1,4 @@
-using Business_Logic.Modules.BanHistoryModule;
+﻿using Business_Logic.Modules.BanHistoryModule;
 using Business_Logic.Modules.BanHistoryModule.Interface;
 using Business_Logic.Modules.ItemModule;
 using Business_Logic.Modules.ItemModule.Interface;
@@ -23,6 +23,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Newtonsoft.Json;
+using BIDs_API.Mapper;
 
 namespace BIDs_API
 {
@@ -43,6 +45,18 @@ namespace BIDs_API
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BIDs", Version = "v1" });
+
+                // hiển thị khung authorize điền token
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \\n\\n
+                      Enter your token in the text input below.
+                      \\n\\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer"
+                });
             });
             services.AddDbContext<BIDsContext>(
                 opt => opt.UseSqlServer(
@@ -65,6 +79,7 @@ namespace BIDs_API
                         ClockSkew = TimeSpan.Zero
                     };
                 });
+
             //User Module
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
@@ -91,6 +106,11 @@ namespace BIDs_API
             services.AddScoped<IPaymentService, PaymentService>();
             //Login Module
             services.AddScoped<ILoginService, LoginService>();
+
+            services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
+            services.AddAutoMapper(typeof(Mapping));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

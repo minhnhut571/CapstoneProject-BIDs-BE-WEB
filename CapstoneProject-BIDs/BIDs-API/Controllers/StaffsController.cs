@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Data_Access.Entities;
 using Business_Logic.Modules.StaffModule.Interface;
 using Business_Logic.Modules.StaffModule.Request;
+using Business_Logic.Modules.StaffModule.Response;
+using AutoMapper;
 
 namespace BIDs_API.Controllers
 {
@@ -16,19 +18,27 @@ namespace BIDs_API.Controllers
     public class StaffsController : ControllerBase
     {
         private readonly IStaffService _StaffService;
+        private readonly IMapper _mapper;
 
-        public StaffsController(IStaffService StaffService)
+        public StaffsController(IStaffService StaffService
+            , IMapper mapper)
         {
             _StaffService = StaffService;
+            _mapper = mapper;
         }
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Staff>>> GetStaffsForAdmin()
+        public async Task<ActionResult<IEnumerable<StaffResponse>>> GetStaffsForAdmin()
         {
             try
             {
-                var response = await _StaffService.GetAll();
+                
+                var list = await _StaffService.GetAll();
+                var response = list.Select
+                           (
+                             emp => _mapper.Map<Staff, StaffResponse>(emp)
+                           );
                 if (response == null)
                 {
                     return NotFound();
@@ -43,9 +53,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Staff>> GetStaffByID([FromRoute] Guid id)
+        public async Task<ActionResult<StaffResponse>> GetStaffByID([FromRoute] Guid id)
         {
-            var Staff = await _StaffService.GetStaffByID(id);
+            var Staff = _mapper.Map<StaffResponse>( await _StaffService.GetStaffByID(id));
 
             if (Staff == null)
             {
@@ -57,9 +67,22 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_name/{name}")]
-        public async Task<ActionResult<Staff>> GetStaffByName([FromRoute] string name)
+        public async Task<ActionResult<StaffResponse>> GetStaffByName([FromRoute] string name)
         {
-            var Staff = await _StaffService.GetStaffByName(name);
+            var Staff = _mapper.Map<StaffResponse>(await _StaffService.GetStaffByName(name));
+
+            if (Staff == null)
+            {
+                return NotFound();
+            }
+
+            return Staff;
+        }
+
+        [HttpGet("by_account_name/{name}")]
+        public async Task<ActionResult<StaffResponse>> GetStaffByAccountName([FromRoute] string name)
+        {
+            var Staff = _mapper.Map<StaffResponse>(await _StaffService.GetStaffByAccountName(name));
 
             if (Staff == null)
             {
@@ -88,11 +111,11 @@ namespace BIDs_API.Controllers
         // POST api/<ValuesController>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Staff>> PostStaff([FromBody] CreateStaffRequest createStaffRequest)
+        public async Task<ActionResult<StaffResponse>> PostStaff([FromBody] CreateStaffRequest createStaffRequest)
         {
             try
             {
-                return Ok(await _StaffService.AddNewStaff(createStaffRequest));
+                return Ok(_mapper.Map<StaffResponse>(await _StaffService.AddNewStaff(createStaffRequest)));
             }
             catch (Exception ex)
             {

@@ -60,6 +60,20 @@ namespace Business_Logic.Modules.StaffModule
             return Staff;
         }
 
+        public async Task<Staff> GetStaffByAccountName(string accountName)
+        {
+            if (accountName == null)
+            {
+                throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
+            }
+            var Staff = await _StaffRepository.GetFirstOrDefaultAsync(x => x.AccountName == accountName);
+            if (Staff == null)
+            {
+                throw new Exception(ErrorMessage.StaffError.STAFF_NOT_FOUND);
+            }
+            return Staff;
+        }
+
         public async Task<Guid?> AddNewStaff(CreateStaffRequest StaffRequest)
         {
 

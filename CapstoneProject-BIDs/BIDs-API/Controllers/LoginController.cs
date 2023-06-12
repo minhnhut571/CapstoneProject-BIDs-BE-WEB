@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using Business_Logic.Modules.StaffModule.Interface;
+using Business_Logic.Modules.UserModule.Interface;
+using Business_Logic.Modules.RoleModule.Interface;
 
 namespace BIDs_API.Controllers
 {
@@ -16,30 +19,22 @@ namespace BIDs_API.Controllers
     {
         private readonly ILoginService _LoginService;
         private readonly IConfiguration _configuration;
-        //private readonly SignInManager<User> _signInManager;
+        private readonly IStaffService _staffService;
+        private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
         public LoginController(ILoginService LoginService
-            //, SignInManager<User> signInManager
-            , IConfiguration configuration)
+            , IConfiguration configuration
+            , IStaffService staffService
+            , IUserService userService
+            , IRoleService roleService)
         {
             _LoginService = LoginService;
-            //_signInManager = signInManager;
             _configuration = configuration;
+            _staffService = staffService;
+            _userService = userService;
+            _roleService = roleService;
         }
 
-        //// POST api/<ValuesController>
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
-        //{
-        //    try
-        //    {
-        //        return Ok(_LoginService.Login(loginRequest));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
 
         [HttpPost("login-user")]
         public async Task<IActionResult> LoginUser([FromBody] LoginRequest login)
@@ -60,7 +55,7 @@ namespace BIDs_API.Controllers
                  {
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
 
-                    new Claim("UserId", string.Join(",", login.AccountName))
+                    new Claim("UserName", string.Join(",", login.AccountName))
 
                 }),
                 Expires = expiry,
@@ -89,8 +84,8 @@ namespace BIDs_API.Controllers
                  {
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
 
-                    new Claim("UserId", string.Join(",", login.AccountName)),
-                    new Claim("BranchIds", string.Join(",", result.RoleId)),
+                    new Claim("StaffName", string.Join(",", login.AccountName)),
+                    new Claim("RoleID", string.Join(",", result.RoleId)),
 
                 }),
                 Expires = expiry,
@@ -100,30 +95,87 @@ namespace BIDs_API.Controllers
             return Ok(new LoginRespone { Successful = true, Token = new JwtSecurityTokenHandler().WriteToken(token) });
         }
 
-        //[HttpPost("decrypttoken")]
-        //public async Task<IActionResult> DecryptToken(TokenModel tokenmodel)
-        //{
-        //    var token = tokenmodel.AccessToken;
-        //    if (token != null)
-        //    {
-        //        var readToken = _LoginService.EncrypToken(token);
-        //        var respone = readToken.Claims;
-        //        var accountID = new Guid();
-        //        foreach (var x in respone)
-        //        {
-        //            accountID = Guid.Parse(x.Value);
-        //        }
-        //        var userPermissions = await _permissionService.ShowPermission(userId);
-        //        var user = await _userService.GetUserById(userId);
-        //        user.UserPermission = (ICollection<Core.Display.DisplayPermission>)userPermissions;
-        //        return Ok(new
-        //        {
-        //            User = user,
-        //            BranchIds = branchIds,
-        //        });
-        //    }
-        //    return BadRequest();
-        //}
+        [HttpPost("decrypttoken-staff")]
+        public async Task<IActionResult> DecryptTokenForStaff([FromHeader]string token)
+        {
+            if (token != null)
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                //Decode JWT
+                var claims = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecurityKey"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                var readToken = claims;
+                var respone = readToken.Claims;
+                var staffName = "";
+                int roleId = new int();
+                foreach (var x in respone)
+                {
+                    switch (x.Type)
+                    {
+                        case "StaffName":
+                            staffName = x.Value;
+                            break;
+                        case "RoleID":
+                            roleId = int.Parse(x.Value);
+                            break;
+                    }
+                }
+                var staff = await _staffService.GetStaffByAccountName(staffName);
+                var role = await _roleService.GetRoleByID(roleId);
+                return Ok(new
+                {
+                    Staff = staff,
+                    Role = role
+                });
+            }
+            return BadRequest();
+        }
+
+        [HttpPost("decrypttoken-user")]
+        public async Task<IActionResult> DecryptTokenForUser([FromHeader] string token)
+        {
+            
+            if (token != null)
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                //Decode JWT
+                var claims = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecurityKey"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                var readToken = claims;
+                var respone = readToken.Claims;
+                var username = "";
+                foreach (var x in respone)
+                {
+                    switch (x.Type)
+                    {
+                        case "UserName":
+                            username = x.Value;
+                            break;
+                    }
+                }
+                var user = await _userService.GetUserByAccountName(username);
+                return Ok(new
+                {
+                    User = user,
+                });
+            }
+            return BadRequest();
+        }
+
 
         // PUT api/<ValuesController>/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

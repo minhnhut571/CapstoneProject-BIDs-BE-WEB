@@ -22,6 +22,8 @@ namespace Business_Logic.Modules.StaffModule.Interface
 
         public Task<Staff> GetStaffByName(string Name);
 
+        public Task<Staff> GetStaffByAccountName(string Name);
+
         public Task AcceptCreateAccount(Guid? CreateAccountID);
 
         public Task DenyCreate(Guid? CreateAccountID);

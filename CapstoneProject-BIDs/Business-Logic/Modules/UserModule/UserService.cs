@@ -68,6 +68,20 @@ namespace Business_Logic.Modules.UserModule
             return user;
         }
 
+        public async Task<User> GetUserByAccountName(string accountName)
+        {
+            if (accountName == null)
+            {
+                throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
+            }
+            var user = await _UserRepository.GetFirstOrDefaultAsync(x => x.AccountName == accountName);
+            if (user == null)
+            {
+                throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
+            }
+            return user;
+        }
+
         public async Task<Guid?> AddNewUser(CreateUserRequest userRequest)
         {
 
