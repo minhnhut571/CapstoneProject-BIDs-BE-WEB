@@ -10,11 +10,11 @@ namespace Business_Logic.Modules.SessionModule.Interface
 {
     public interface ISessionService
     {
-        public Task<Guid?> AddNewSession(CreateSessionRequest SessionCreate);
+        public Task<Session> AddNewSession(CreateSessionRequest SessionCreate);
 
-        public Task UpdateSession(UpdateSessionRequest SessionUpdate);
+        public Task<Session> UpdateSession(UpdateSessionRequest SessionUpdate);
 
-        public Task DeleteSession(Guid? SessionDeleteID);
+        public Task<Session> DeleteSession(Guid? SessionDeleteID);
 
         public Task<ICollection<Session>> GetAll();
 

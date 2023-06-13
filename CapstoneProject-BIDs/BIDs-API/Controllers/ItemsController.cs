@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Data_Access.Entities;
 using Business_Logic.Modules.ItemModule.Interface;
 using Business_Logic.Modules.ItemModule.Request;
+using BIDs_API.SignalR;
+using Microsoft.AspNetCore.SignalR;
+using Business_Logic.Modules.ItemModule.Request;
 
 namespace BIDs_API.Controllers
 {
@@ -16,10 +19,13 @@ namespace BIDs_API.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly IItemService _ItemService;
+        private readonly IHubContext<ItemHub> _hubItemContext;
 
-        public ItemsController(IItemService ItemService)
+        public ItemsController(IItemService ItemService
+            , IHubContext<ItemHub> hubItemContext)
         {
             _ItemService = ItemService;
+            _hubItemContext = hubItemContext;
         }
 
         // GET api/<ValuesController>
@@ -71,16 +77,40 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_type_name/{name}")]
-        public async Task<ActionResult<Item>> GetItemByTypeName([FromRoute] string name)
+        public async Task<ActionResult<IEnumerable<Item>>> GetItemByTypeName([FromRoute] string name)
         {
-            var Item = await _ItemService.GetItemByTypeName(name);
-
-            if (Item == null)
+            try
             {
-                return NotFound();
+                var response = await _ItemService.GetItemByTypeName(name);
+                if (response == null)
+                {
+                    return NotFound();
+                }
+                return Ok(response);
             }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
-            return Item;
+        // GET api/<ValuesController>/abc
+        [HttpGet("by_user/{id}")]
+        public async Task<ActionResult<IEnumerable<Item>>> GetItemByTypeName([FromRoute] Guid? id)
+        {
+            try
+            {
+                var response = await _ItemService.GetItemByUserID(id);
+                if (response == null)
+                {
+                    return NotFound();
+                }
+                return Ok(response);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         // PUT api/<ValuesController>/5
@@ -90,7 +120,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _ItemService.UpdateItem(updateItemRequest);
+                var Item = await _ItemService.UpdateItem(updateItemRequest);
+                await _hubItemContext.Clients.All.SendAsync("ReceiveItemUpdate", Item);
                 return Ok();
             }
             catch (Exception ex)
@@ -106,7 +137,9 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                return Ok(await _ItemService.AddNewItem(createItemRequest));
+                var Item = await _ItemService.AddNewItem(createItemRequest);
+                await _hubItemContext.Clients.All.SendAsync("ReceiveItemAdd", Item);
+                return Ok(Item);
             }
             catch (Exception ex)
             {
@@ -120,7 +153,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _ItemService.DeleteItem(id);
+                var Item = await _ItemService.DeleteItem(id);
+                await _hubItemContext.Clients.All.SendAsync("ReceiveItemDelete", Item);
                 return Ok();
             }
             catch (Exception ex)

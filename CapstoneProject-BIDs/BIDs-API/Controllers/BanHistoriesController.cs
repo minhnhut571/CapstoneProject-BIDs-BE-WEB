@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Data_Access.Entities;
 using Business_Logic.Modules.BanHistoryModule.Interface;
 using Business_Logic.Modules.BanHistoryModule.Request;
+using BIDs_API.SignalR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BIDs_API.Controllers
 {
@@ -16,10 +18,13 @@ namespace BIDs_API.Controllers
     public class BanHistoriesController : ControllerBase
     {
         private readonly IBanHistoryService _BanHistoryService;
+        private readonly IHubContext<BanHistoryHub> _hubBanHistoryContext;
 
-        public BanHistoriesController(IBanHistoryService BanHistoryService)
+        public BanHistoriesController(IBanHistoryService BanHistoryService
+            , IHubContext<BanHistoryHub> hubBanHistoryContext)
         {
             _BanHistoryService = BanHistoryService;
+            _hubBanHistoryContext = hubBanHistoryContext;
         }
 
         // GET api/<ValuesController>
@@ -43,30 +48,40 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<BanHistory>> GetBanHistoryByUserID([FromRoute] Guid? id)
+        public async Task<ActionResult<IEnumerable<BanHistory>>> GetBanHistoryByUserID([FromRoute] Guid? id)
         {
-            var BanHistory = await _BanHistoryService.GetBanHistoryByUserID(id);
-
-            if (BanHistory == null)
+            try
             {
-                return NotFound();
+                var response = await _BanHistoryService.GetBanHistoryByUserID(id);
+                if (response == null)
+                {
+                    return NotFound();
+                }
+                return Ok(response);
             }
-
-            return BanHistory;
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_name/{name}")]
-        public async Task<ActionResult<BanHistory>> GetBanHistoryByUserName([FromRoute] string name)
+        public async Task<ActionResult<IEnumerable<BanHistory>>> GetBanHistoryByUserName([FromRoute] string name)
         {
-            var BanHistory = await _BanHistoryService.GetBanHistoryByUserName(name);
-
-            if (BanHistory == null)
+            try
             {
-                return NotFound();
+                var response = await _BanHistoryService.GetBanHistoryByUserName(name);
+                if (response == null)
+                {
+                    return NotFound();
+                }
+                return Ok(response);
             }
-
-            return BanHistory;
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         // PUT api/<ValuesController>/5
@@ -76,7 +91,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _BanHistoryService.UpdateBanHistory(updateBanHistoryRequest);
+                var BanHistory = await _BanHistoryService.UpdateBanHistory(updateBanHistoryRequest);
+                await _hubBanHistoryContext.Clients.All.SendAsync("ReceiveBanHistoryUpdate", BanHistory);
                 return Ok();
             }
             catch (Exception ex)
@@ -92,7 +108,9 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                return Ok(await _BanHistoryService.AddNewBanHistory(createBanHistoryRequest));
+                var BanHistory = await _BanHistoryService.AddNewBanHistory(createBanHistoryRequest);
+                await _hubBanHistoryContext.Clients.All.SendAsync("ReceiveBanHistoryAdd", BanHistory);
+                return Ok(BanHistory);
             }
             catch (Exception ex)
             {

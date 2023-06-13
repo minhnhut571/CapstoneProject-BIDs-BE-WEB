@@ -53,7 +53,7 @@ namespace Business_Logic.Modules.RoleModule
             return Role;
         }
 
-        public async Task<int> AddNewRole(CreateRoleRequest RoleRequest)
+        public async Task<Role> AddNewRole(CreateRoleRequest RoleRequest)
         {
 
             ValidationResult result = new CreateRoleRequestValidator().Validate(RoleRequest);
@@ -75,10 +75,10 @@ namespace Business_Logic.Modules.RoleModule
             newRole.Status = true;
 
             await _RoleRepository.AddAsync(newRole);
-            return newRole.RoleId;
+            return newRole;
         }
 
-        public async Task UpdateRole(UpdateRoleRequest RoleRequest)
+        public async Task<Role> UpdateRole(UpdateRoleRequest RoleRequest)
         {
             try
             {
@@ -106,6 +106,7 @@ namespace Business_Logic.Modules.RoleModule
                 RoleUpdate.Status = RoleRequest.Status;
 
                 await _RoleRepository.UpdateAsync(RoleUpdate);
+                return RoleUpdate;
             }
             catch (Exception ex)
             {
@@ -115,11 +116,11 @@ namespace Business_Logic.Modules.RoleModule
 
         }
 
-        public async Task DeleteRole(int RoleDeleteID)
+        public async Task<Role> DeleteRole(int RoleDeleteID)
         {
             try
             {
-                if (RoleDeleteID == null)
+                if (RoleDeleteID <= 0)
                 {
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
@@ -133,6 +134,7 @@ namespace Business_Logic.Modules.RoleModule
 
                 RoleDelete.Status = false;
                 await _RoleRepository.UpdateAsync(RoleDelete);
+                return RoleDelete;
             }
             catch (Exception ex)
             {

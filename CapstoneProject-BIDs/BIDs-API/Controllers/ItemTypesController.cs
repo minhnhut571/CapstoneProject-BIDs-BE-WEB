@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Data_Access.Entities;
 using Business_Logic.Modules.ItemTypeModule.Interface;
 using Business_Logic.Modules.ItemTypeModule.Request;
+using BIDs_API.SignalR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BIDs_API.Controllers
 {
@@ -16,10 +18,12 @@ namespace BIDs_API.Controllers
     public class ItemTypesController : ControllerBase
     {
         private readonly IItemTypeService _ItemTypeService;
-
-        public ItemTypesController(IItemTypeService ItemTypeService)
+        private readonly IHubContext<ItemTypeHub> _hubItemTypeContext;
+        public ItemTypesController(IItemTypeService ItemTypeService
+            , IHubContext<ItemTypeHub> hubItemTypeContext)
         {
             _ItemTypeService = ItemTypeService;
+            _hubItemTypeContext = hubItemTypeContext;
         }
 
         // GET api/<ValuesController>
@@ -76,7 +80,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _ItemTypeService.UpdateItemType(updateItemTypeRequest);
+                var ItemType = await _ItemTypeService.UpdateItemType(updateItemTypeRequest);
+                await _hubItemTypeContext.Clients.All.SendAsync("ReceiveItemTypeUpdate", ItemType);
                 return Ok();
             }
             catch (Exception ex)
@@ -92,7 +97,9 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                return Ok(await _ItemTypeService.AddNewItemType(createItemTypeRequest));
+                var ItemType = await _ItemTypeService.AddNewItemType(createItemTypeRequest);
+                await _hubItemTypeContext.Clients.All.SendAsync("ReceiveItemTypeAdd", ItemType);
+                return Ok(ItemType);
             }
             catch (Exception ex)
             {
@@ -106,7 +113,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _ItemTypeService.DeleteItemType(id);
+                var ItemType = await _ItemTypeService.DeleteItemType(id);
+                await _hubItemTypeContext.Clients.All.SendAsync("ReceiveItemTypeDelete", ItemType);
                 return Ok();
             }
             catch (Exception ex)

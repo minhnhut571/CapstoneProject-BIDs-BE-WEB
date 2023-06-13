@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Data_Access.Entities;
 using Business_Logic.Modules.RoleModule.Interface;
 using Business_Logic.Modules.RoleModule.Request;
+using BIDs_API.SignalR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BIDs_API.Controllers
 {
@@ -16,10 +18,12 @@ namespace BIDs_API.Controllers
     public class RolesController : ControllerBase
     {
         private readonly IRoleService _RoleService;
-
-        public RolesController(IRoleService RoleService)
+        private readonly IHubContext<RoleHub> _hubRoleContext;
+        public RolesController(IRoleService RoleService
+            , IHubContext<RoleHub> hubRoleContext)
         {
             _RoleService = RoleService;
+            _hubRoleContext = hubRoleContext;
         }
 
         // GET api/<ValuesController>
@@ -76,7 +80,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _RoleService.UpdateRole(updateRoleRequest);
+                var Role = await _RoleService.UpdateRole(updateRoleRequest);
+                await _hubRoleContext.Clients.All.SendAsync("ReceiveRoleUpdate", Role);
                 return Ok();
             }
             catch (Exception ex)
@@ -92,7 +97,9 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                return Ok(await _RoleService.AddNewRole(createRoleRequest));
+                var Role = await _RoleService.AddNewRole(createRoleRequest);
+                await _hubRoleContext.Clients.All.SendAsync("ReceiveRoleAdd", Role);
+                return Ok(Role);
             }
             catch (Exception ex)
             {
@@ -106,7 +113,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _RoleService.DeleteRole(id);
+                var Role = await _RoleService.DeleteRole(id);
+                await _hubRoleContext.Clients.All.SendAsync("ReceiveRoleDelete", Role);
                 return Ok();
             }
             catch (Exception ex)

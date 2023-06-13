@@ -82,7 +82,7 @@ namespace Business_Logic.Modules.UserModule
             return user;
         }
 
-        public async Task<Guid?> AddNewUser(CreateUserRequest userRequest)
+        public async Task<User> AddNewUser(CreateUserRequest userRequest)
         {
 
             ValidationResult result = new CreateUserRequestValidator().Validate(userRequest);
@@ -150,10 +150,10 @@ namespace Business_Logic.Modules.UserModule
             newUser.Status = (int)UserStatusEnum.Waitting;
 
             await _UserRepository.AddAsync(newUser);
-            return newUser.UserId;
+            return newUser;
         }
 
-        public async Task UpdateUser(UpdateUserRequest userRequest)
+        public async Task<User> UpdateUser(UpdateUserRequest userRequest)
         {
             try
             {
@@ -204,6 +204,7 @@ namespace Business_Logic.Modules.UserModule
                 userUpdate.UpdateDate = DateTime.Now;
 
                 await _UserRepository.UpdateAsync(userUpdate);
+                return userUpdate;
             }
             catch (Exception ex)
             {

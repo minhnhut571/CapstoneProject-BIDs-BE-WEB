@@ -10,11 +10,11 @@ namespace Business_Logic.Modules.StaffModule.Interface
 {
     public interface IStaffService
     {
-        public Task<Guid?> AddNewStaff(CreateStaffRequest StaffCreate);
+        public Task<Staff> AddNewStaff(CreateStaffRequest StaffCreate);
 
-        public Task UpdateStaff(UpdateStaffRequest StaffUpdate);
+        public Task<Staff> UpdateStaff(UpdateStaffRequest StaffUpdate);
 
-        public Task DeleteStaff(Guid? StaffDeleteID);
+        public Task<Staff> DeleteStaff(Guid? StaffDeleteID);
 
         public Task<ICollection<Staff>> GetAll();
 
@@ -24,13 +24,13 @@ namespace Business_Logic.Modules.StaffModule.Interface
 
         public Task<Staff> GetStaffByAccountName(string Name);
 
-        public Task AcceptCreateAccount(Guid? CreateAccountID);
+        public Task<User> AcceptCreateAccount(Guid? CreateAccountID);
 
-        public Task DenyCreate(Guid? CreateAccountID);
+        public Task<User> DenyCreate(Guid? CreateAccountID);
 
-        public Task BanUser(Guid? BanUserID);
+        public Task<User> BanUser(Guid? BanUserID);
 
-        public Task UnbanUser(Guid? UnbanUserID);
+        public Task<User> UnbanUser(Guid? UnbanUserID);
 
     }
 }

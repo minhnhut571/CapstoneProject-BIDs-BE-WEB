@@ -18,13 +18,16 @@ using Business_Logic.Modules.UserModule;
 using Business_Logic.Modules.UserModule.Interface;
 using Data_Access.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using Newtonsoft.Json;
 using BIDs_API.Mapper;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.SignalR;
+using BIDs_API.SignalR;
+using Business_Logic.Modules.SessionDetailModule.Interface;
+using Business_Logic.Modules.SessionDetailModule;
 
 namespace BIDs_API
 {
@@ -40,7 +43,16 @@ namespace BIDs_API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
+            {
+                builder
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowAnyOrigin()
+                .AllowCredentials()
+                .WithOrigins("http://localhost:4200");
+            }));
+            services.AddSignalR();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -64,6 +76,7 @@ namespace BIDs_API
                 )
             );
             
+
             //services.AddIdentity<Staff, Role>()
             //    .AddEntityFrameworkStores<BIDsContext>()
             //    .AddDefaultTokenProviders(); ;
@@ -79,7 +92,7 @@ namespace BIDs_API
                         ClockSkew = TimeSpan.Zero
                     };
                 });
-
+         
             //User Module
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
@@ -104,6 +117,9 @@ namespace BIDs_API
             //Role Module
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IPaymentService, PaymentService>();
+            //Role Module
+            services.AddScoped<ISessionDetailRepository, SessionDetailRepository>();
+            services.AddScoped<ISessionDetailService, SessionDetailService>();
             //Login Module
             services.AddScoped<ILoginService, LoginService>();
 
@@ -134,6 +150,14 @@ namespace BIDs_API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<UserHub>("/userhub");
+                endpoints.MapHub<StaffHub>("/staffhub");
+                endpoints.MapHub<SessionHub>("/sessionhub");
+                endpoints.MapHub<SessionDetailHub>("/sessiondetailhub");
+                endpoints.MapHub<RoleHub>("/rolehub");
+                endpoints.MapHub<ItemHub>("/itemhub");
+                endpoints.MapHub<ItemTypeHub>("/itemtypehub");
+                endpoints.MapHub<BanHistoryHub>("/banhistoryhub");
             });
         }
     }

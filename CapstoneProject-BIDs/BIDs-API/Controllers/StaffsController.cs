@@ -10,6 +10,10 @@ using Business_Logic.Modules.StaffModule.Interface;
 using Business_Logic.Modules.StaffModule.Request;
 using Business_Logic.Modules.StaffModule.Response;
 using AutoMapper;
+using BIDs_API.SignalR;
+using Microsoft.AspNetCore.SignalR;
+using Business_Logic.Modules.UserModule.Request;
+using System.Collections;
 
 namespace BIDs_API.Controllers
 {
@@ -19,12 +23,17 @@ namespace BIDs_API.Controllers
     {
         private readonly IStaffService _StaffService;
         private readonly IMapper _mapper;
-
+        private readonly IHubContext<UserHub> _hubUserContext;
+        private readonly IHubContext<StaffHub> _hubStaffContext;
         public StaffsController(IStaffService StaffService
-            , IMapper mapper)
+            , IMapper mapper
+            , IHubContext<UserHub> hubUserContext
+            , IHubContext<StaffHub> hubStaffContext)
         {
             _StaffService = StaffService;
             _mapper = mapper;
+            _hubUserContext = hubUserContext;
+            _hubStaffContext = hubStaffContext;
         }
 
         // GET api/<ValuesController>
@@ -99,7 +108,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _StaffService.UpdateStaff(updateStaffRequest);
+                var staff = await _StaffService.UpdateStaff(updateStaffRequest);
+                await _hubStaffContext.Clients.All.SendAsync("ReceiveStaffUpdate", staff);
                 return Ok();
             }
             catch (Exception ex)
@@ -115,7 +125,9 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                return Ok(_mapper.Map<StaffResponse>(await _StaffService.AddNewStaff(createStaffRequest)));
+                var staff = await _StaffService.AddNewStaff(createStaffRequest);
+                await _hubStaffContext.Clients.All.SendAsync("ReceiveStaffAdd", staff);
+                return Ok(_mapper.Map<StaffResponse>(staff));
             }
             catch (Exception ex)
             {
@@ -129,7 +141,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _StaffService.DeleteStaff(id);
+                var staff = await _StaffService.DeleteStaff(id);
+                await _hubStaffContext.Clients.All.SendAsync("ReceiveStaffDelete", staff);
                 return Ok();
             }
             catch (Exception ex)
@@ -145,7 +158,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _StaffService.AcceptCreateAccount(AcceptID);
+                var user = await _StaffService.AcceptCreateAccount(AcceptID);
+                await _hubUserContext.Clients.All.SendAsync("ReceiveUserActive", user);
                 return Ok();
             }
             catch (Exception ex)
@@ -161,7 +175,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _StaffService.DenyCreate(DenyID);
+                var user = await _StaffService.DenyCreate(DenyID);
+                await _hubUserContext.Clients.All.SendAsync("ReceiveUserDeny", user);
                 return Ok();
             }
             catch (Exception ex)
@@ -177,7 +192,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _StaffService.BanUser(BanID);
+                var user = await _StaffService.BanUser(BanID);
+                await _hubUserContext.Clients.All.SendAsync("ReceiveUserBan", user);
                 return Ok();
             }
             catch (Exception ex)
@@ -193,7 +209,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _StaffService.UnbanUser(UnbanID);
+                var user = await _StaffService.UnbanUser(UnbanID);
+                await _hubUserContext.Clients.All.SendAsync("ReceiveUserUnban", user);
                 return Ok();
             }
             catch (Exception ex)

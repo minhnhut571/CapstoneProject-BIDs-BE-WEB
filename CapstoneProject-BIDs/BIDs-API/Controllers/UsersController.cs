@@ -4,6 +4,8 @@ using Business_Logic.Modules.UserModule.Interface;
 using Business_Logic.Modules.UserModule.Request;
 using AutoMapper;
 using Business_Logic.Modules.UserModule.Response;
+using Microsoft.AspNetCore.SignalR;
+using BIDs_API.SignalR;
 
 namespace BIDs_API.Controllers
 {
@@ -13,12 +15,15 @@ namespace BIDs_API.Controllers
     {
         private readonly IUserService _userService;
         public readonly IMapper _mapper;
+        private readonly IHubContext<UserHub> _hubContext;
 
         public UsersController(IUserService userService
-            , IMapper mapper)
+            , IMapper mapper
+            , IHubContext<UserHub> hubContext)
         {
             _userService = userService;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         // GET api/<ValuesController>
@@ -162,7 +167,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _userService.UpdateUser(updateUserRequest);
+                var user = await _userService.UpdateUser(updateUserRequest);
+                await _hubContext.Clients.All.SendAsync("ReceiveUserUpdate", user);
                 return Ok();
             }
             catch (Exception ex)
@@ -178,7 +184,9 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                return Ok(_mapper.Map<UserResponse>(await _userService.AddNewUser(createUserRequest)));
+                var user = await _userService.AddNewUser(createUserRequest);
+                await _hubContext.Clients.All.SendAsync("ReceiveUserAdd", user);
+                return Ok(_mapper.Map<UserResponse>(user));
             }
             catch (Exception ex)
             {

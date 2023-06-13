@@ -30,13 +30,13 @@ namespace Business_Logic.Modules.BanHistoryModule
             return _BanHistoryRepository.GetBanHistorysBy(x => x.Status == true, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
-        public async Task<BanHistory> GetBanHistoryByUserID(Guid? id)
+        public async Task<BanHistory> GetBanHistoryByID(Guid? id)
         {
             if (id == null)
             {
                 throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
             }
-            var BanHistory = await _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.UserId == id);
+            var BanHistory = await _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.BanId == id);
             if (BanHistory == null)
             {
                 throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
@@ -44,14 +44,28 @@ namespace Business_Logic.Modules.BanHistoryModule
             return BanHistory;
         }
 
-        public async Task<BanHistory> GetBanHistoryByUserName(string userName)
+        public async Task<ICollection<BanHistory>> GetBanHistoryByUserID(Guid? id)
+        {
+            if (id == null)
+            {
+                throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
+            }
+            var BanHistory = await _BanHistoryRepository.GetBanHistorysBy(x => x.UserId == id);
+            if (BanHistory == null)
+            {
+                throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
+            }
+            return BanHistory;
+        }
+
+        public async Task<ICollection<BanHistory>> GetBanHistoryByUserName(string userName)
         {
             if (userName == null)
             {
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
             User user = await _UserService.GetUserByName(userName);
-            BanHistory BanHistory = await _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.UserId == user.UserId);
+            var BanHistory = await _BanHistoryRepository.GetBanHistorysBy(x => x.UserId == user.UserId);
             if (BanHistory == null)
             {
                 throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
@@ -59,7 +73,7 @@ namespace Business_Logic.Modules.BanHistoryModule
             return BanHistory;
         }
 
-        public async Task<Guid?> AddNewBanHistory(CreateBanHistoryRequest BanHistoryRequest)
+        public async Task<BanHistory> AddNewBanHistory(CreateBanHistoryRequest BanHistoryRequest)
         {
 
             ValidationResult result = new CreateBanHistoryRequestValidator().Validate(BanHistoryRequest);
@@ -79,10 +93,10 @@ namespace Business_Logic.Modules.BanHistoryModule
 
             await _BanHistoryRepository.AddAsync(newBanHistory);
             await _StaffService.BanUser(newBanHistory.BanId);
-            return newBanHistory.BanId;
+            return newBanHistory;
         }
 
-        public async Task UpdateBanHistory(UpdateBanHistoryRequest BanHistoryRequest)
+        public async Task<BanHistory> UpdateBanHistory(UpdateBanHistoryRequest BanHistoryRequest)
         {
             try
             {
@@ -104,6 +118,7 @@ namespace Business_Logic.Modules.BanHistoryModule
                 BanHistoryUpdate.Status = BanHistoryRequest.Status;
 
                 await _BanHistoryRepository.UpdateAsync(BanHistoryUpdate);
+                return BanHistoryUpdate;
             }
             catch (Exception ex)
             {

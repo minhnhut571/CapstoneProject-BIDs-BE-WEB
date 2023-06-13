@@ -10,11 +10,11 @@ namespace Business_Logic.Modules.RoleModule.Interface
 {
     public interface IRoleService
     {
-        public Task<int> AddNewRole(CreateRoleRequest RoleCreate);
+        public Task<Role> AddNewRole(CreateRoleRequest RoleCreate);
 
-        public Task UpdateRole(UpdateRoleRequest RoleUpdate);
+        public Task<Role> UpdateRole(UpdateRoleRequest RoleUpdate);
 
-        public Task DeleteRole(int RoleDeleteID);
+        public Task<Role> DeleteRole(int RoleDeleteID);
 
         public Task<ICollection<Role>> GetAll();
 

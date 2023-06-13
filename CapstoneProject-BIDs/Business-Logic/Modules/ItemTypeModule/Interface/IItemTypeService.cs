@@ -10,11 +10,11 @@ namespace Business_Logic.Modules.ItemTypeModule.Interface
 {
     public interface IItemTypeService
     {
-        public Task<Guid?> AddNewItemType(CreateItemTypeRequest ItemTypeCreate);
+        public Task<ItemType> AddNewItemType(CreateItemTypeRequest ItemTypeCreate);
 
-        public Task UpdateItemType(UpdateItemTypeRequest ItemTypeUpdate);
+        public Task<ItemType> UpdateItemType(UpdateItemTypeRequest ItemTypeUpdate);
 
-        public Task DeleteItemType(Guid? ItemTypeDeleteID);
+        public Task<ItemType> DeleteItemType(Guid? ItemTypeDeleteID);
 
         public Task<ICollection<ItemType>> GetAll();
 

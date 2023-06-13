@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Data_Access.Entities;
 using Business_Logic.Modules.SessionModule.Interface;
 using Business_Logic.Modules.SessionModule.Request;
+using BIDs_API.SignalR;
+using Microsoft.AspNetCore.SignalR;
+using Business_Logic.Modules.SessionModule.Request;
 
 namespace BIDs_API.Controllers
 {
@@ -16,10 +19,13 @@ namespace BIDs_API.Controllers
     public class SessionsController : ControllerBase
     {
         private readonly ISessionService _SessionService;
+        private readonly IHubContext<SessionHub> _hubSessionContext;
 
-        public SessionsController(ISessionService SessionService)
+        public SessionsController(ISessionService SessionService
+            , IHubContext<SessionHub> hubSessionContext)
         {
             _SessionService = SessionService;
+            _hubSessionContext = hubSessionContext;
         }
 
         // GET api/<ValuesController>
@@ -76,7 +82,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _SessionService.UpdateSession(updateSessionRequest);
+                var session = await _SessionService.UpdateSession(updateSessionRequest);
+                await _hubSessionContext.Clients.All.SendAsync("ReceiveSessionUpdate", session);
                 return Ok();
             }
             catch (Exception ex)
@@ -92,7 +99,9 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                return Ok(await _SessionService.AddNewSession(createSessionRequest));
+                var Session = await _SessionService.AddNewSession(createSessionRequest);
+                await _hubSessionContext.Clients.All.SendAsync("ReceiveSessionAdd", Session);
+                return Ok(Session);
             }
             catch (Exception ex)
             {
@@ -106,7 +115,8 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                await _SessionService.DeleteSession(id);
+                var Session = await _SessionService.DeleteSession(id);
+                await _hubSessionContext.Clients.All.SendAsync("ReceiveSessionDelete", Session);
                 return Ok();
             }
             catch (Exception ex)

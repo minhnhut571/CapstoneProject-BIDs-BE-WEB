@@ -53,7 +53,7 @@ namespace Business_Logic.Modules.ItemTypeModule
             return ItemType;
         }
 
-        public async Task<Guid?> AddNewItemType(CreateItemTypeRequest ItemTypeRequest)
+        public async Task<ItemType> AddNewItemType(CreateItemTypeRequest ItemTypeRequest)
         {
 
             ValidationResult result = new CreateItemTypeRequestValidator().Validate(ItemTypeRequest);
@@ -76,10 +76,10 @@ namespace Business_Logic.Modules.ItemTypeModule
             newItemType.Status = true;
 
             await _ItemTypeRepository.AddAsync(newItemType);
-            return newItemType.ItemTypeId;
+            return newItemType;
         }
 
-        public async Task UpdateItemType(UpdateItemTypeRequest ItemTypeRequest)
+        public async Task<ItemType> UpdateItemType(UpdateItemTypeRequest ItemTypeRequest)
         {
             try
             {
@@ -107,6 +107,7 @@ namespace Business_Logic.Modules.ItemTypeModule
                 ItemTypeUpdate.Status = ItemTypeRequest.Status;
 
                 await _ItemTypeRepository.UpdateAsync(ItemTypeUpdate);
+                return ItemTypeUpdate;
             }
             catch (Exception ex)
             {
@@ -116,7 +117,7 @@ namespace Business_Logic.Modules.ItemTypeModule
 
         }
 
-        public async Task DeleteItemType(Guid? ItemTypeDeleteID)
+        public async Task<ItemType> DeleteItemType(Guid? ItemTypeDeleteID)
         {
             try
             {
@@ -134,6 +135,7 @@ namespace Business_Logic.Modules.ItemTypeModule
 
                 ItemTypeDelete.Status = false;
                 await _ItemTypeRepository.UpdateAsync(ItemTypeDelete);
+                return ItemTypeDelete;
             }
             catch (Exception ex)
             {

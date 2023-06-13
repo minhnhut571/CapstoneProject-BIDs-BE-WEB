@@ -90,5 +90,13 @@
             public readonly static string PAYMENT_EXISTED = "Đơn thanh toán đã tồn tại";
         }
         #endregion
+
+        #region Auction History error message
+        public static class AuctionHistoryError
+        {
+            public readonly static string AUCTION_HISTORY_NOT_FOUND = "Lịch sử đấu giá không tồn tại";
+            public readonly static string AUCTION_HISTORY_EXISTED = "Lịch sử đấu giá đã tồn tại";
+        }
+        #endregion
     }
 }

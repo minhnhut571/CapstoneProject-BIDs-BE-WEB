@@ -55,14 +55,13 @@ namespace Business_Logic.Modules.ItemModule
             return Item;
         }
 
-        public async Task<Item> GetItemByTypeName(string TypeName)
+        public async Task<ICollection<Item>> GetItemByUserID(Guid? id)
         {
-            if (TypeName == null)
+            if (id == null)
             {
-                throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
+                throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
             }
-            ItemType TypeCheck = await _ItemTypeService.GetItemTypeByName(TypeName);
-            var Item = await _ItemRepository.GetFirstOrDefaultAsync(x => x.ItemTypeId == TypeCheck.ItemTypeId);
+            var Item = await _ItemRepository.GetItemsBy(x => x.UserId == id);
             if (Item == null)
             {
                 throw new Exception(ErrorMessage.ItemError.ITEM_NOT_FOUND);
@@ -70,7 +69,22 @@ namespace Business_Logic.Modules.ItemModule
             return Item;
         }
 
-        public async Task<Guid?> AddNewItem(CreateItemRequest ItemRequest)
+        public async Task<ICollection<Item>> GetItemByTypeName(string TypeName)
+        {
+            if (TypeName == null)
+            {
+                throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
+            }
+            ItemType TypeCheck = await _ItemTypeService.GetItemTypeByName(TypeName);
+            var Item = await _ItemRepository.GetItemsBy(x => x.ItemTypeId == TypeCheck.ItemTypeId);
+            if (Item == null)
+            {
+                throw new Exception(ErrorMessage.ItemError.ITEM_NOT_FOUND);
+            }
+            return Item;
+        }
+
+        public async Task<Item> AddNewItem(CreateItemRequest ItemRequest)
         {
 
             ValidationResult result = new CreateItemRequestValidator().Validate(ItemRequest);
@@ -79,12 +93,6 @@ namespace Business_Logic.Modules.ItemModule
                 throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
             }
 
-            Item ItemCheck = _ItemRepository.GetFirstOrDefaultAsync(x => x.ItemName == ItemRequest.ItemName).Result;
-
-            if (ItemCheck != null)
-            {
-                throw new Exception(ErrorMessage.ItemError.ITEM_EXISTED);
-            }
 
             var newItem = new Item();
 
@@ -110,10 +118,10 @@ namespace Business_Logic.Modules.ItemModule
             newItem.Status = false;
 
             await _ItemRepository.AddAsync(newItem);
-            return newItem.ItemId;
+            return newItem;
         }
 
-        public async Task UpdateItem(UpdateItemRequest ItemRequest)
+        public async Task<Item> UpdateItem(UpdateItemRequest ItemRequest)
         {
             try
             {
@@ -154,6 +162,7 @@ namespace Business_Logic.Modules.ItemModule
                 ItemUpdate.UpdateDate = DateTime.Now;
 
                 await _ItemRepository.UpdateAsync(ItemUpdate);
+                return ItemUpdate;
             }
             catch (Exception ex)
             {
@@ -163,7 +172,7 @@ namespace Business_Logic.Modules.ItemModule
 
         }
 
-        public async Task DeleteItem(Guid? ItemDeleteID)
+        public async Task<Item> DeleteItem(Guid? ItemDeleteID)
         {
             try
             {
@@ -181,6 +190,7 @@ namespace Business_Logic.Modules.ItemModule
 
                 ItemDelete.Status = false;
                 await _ItemRepository.UpdateAsync(ItemDelete);
+                return ItemDelete;
             }
             catch (Exception ex)
             {

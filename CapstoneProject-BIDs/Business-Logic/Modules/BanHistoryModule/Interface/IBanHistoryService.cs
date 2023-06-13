@@ -10,17 +10,17 @@ namespace Business_Logic.Modules.BanHistoryModule.Interface
 {
     public interface IBanHistoryService
     {
-        public Task<Guid?> AddNewBanHistory(CreateBanHistoryRequest BanHistoryCreate);
+        public Task<BanHistory> AddNewBanHistory(CreateBanHistoryRequest BanHistoryCreate);
 
-        public Task UpdateBanHistory(UpdateBanHistoryRequest BanHistoryUpdate);
+        public Task<BanHistory> UpdateBanHistory(UpdateBanHistoryRequest BanHistoryUpdate);
 
         //public Task DeleteBanHistory(Guid? BanHistoryDeleteID);
 
         public Task<ICollection<BanHistory>> GetAll();
 
-        public Task<BanHistory> GetBanHistoryByUserID(Guid? id);
+        public Task<ICollection<BanHistory>> GetBanHistoryByUserID(Guid? id);
 
-        public Task<BanHistory> GetBanHistoryByUserName(string Name);
+        public Task<ICollection<BanHistory>> GetBanHistoryByUserName(string Name);
 
     }
 }

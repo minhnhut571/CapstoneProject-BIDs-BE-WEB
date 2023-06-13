@@ -74,7 +74,7 @@ namespace Business_Logic.Modules.StaffModule
             return Staff;
         }
 
-        public async Task<Guid?> AddNewStaff(CreateStaffRequest StaffRequest)
+        public async Task<Staff> AddNewStaff(CreateStaffRequest StaffRequest)
         {
 
             ValidationResult result = new CreateStaffRequestValidator().Validate(StaffRequest);
@@ -130,10 +130,10 @@ namespace Business_Logic.Modules.StaffModule
             newStaff.Status = true;
 
             await _StaffRepository.AddAsync(newStaff);
-            return newStaff.StaffId;
+            return newStaff;
         }
 
-        public async Task UpdateStaff(UpdateStaffRequest StaffRequest)
+        public async Task<Staff> UpdateStaff(UpdateStaffRequest StaffRequest)
         {
             try
             {
@@ -184,6 +184,7 @@ namespace Business_Logic.Modules.StaffModule
                 StaffUpdate.UpdateDate = DateTime.Now;
 
                 await _StaffRepository.UpdateAsync(StaffUpdate);
+                return StaffUpdate;
             }
             catch (Exception ex)
             {
@@ -193,7 +194,7 @@ namespace Business_Logic.Modules.StaffModule
 
         }
 
-        public async Task DeleteStaff(Guid? StaffDeleteID)
+        public async Task<Staff> DeleteStaff(Guid? StaffDeleteID)
         {
             try
             {
@@ -211,6 +212,7 @@ namespace Business_Logic.Modules.StaffModule
 
                 StaffDelete.Status = false;
                 await _StaffRepository.UpdateAsync(StaffDelete);
+                return StaffDelete;
             }
             catch (Exception ex)
             {
@@ -219,7 +221,7 @@ namespace Business_Logic.Modules.StaffModule
             }
         }
 
-        public async Task AcceptCreateAccount(Guid? accountCreateID)
+        public async Task<User> AcceptCreateAccount(Guid? accountCreateID)
         {
             try
             {
@@ -263,6 +265,8 @@ namespace Business_Logic.Modules.StaffModule
                 SmtpServer.EnableSsl = true;
 
                 SmtpServer.Send(mail);
+
+                return UserCreate;
             }
             catch (Exception ex)
             {
@@ -271,7 +275,7 @@ namespace Business_Logic.Modules.StaffModule
             }
         }
 
-        public async Task DenyCreate(Guid? accountCreateID)
+        public async Task<User> DenyCreate(Guid? accountCreateID)
         {
             try
             {
@@ -315,6 +319,7 @@ namespace Business_Logic.Modules.StaffModule
                 SmtpServer.EnableSsl = true;
 
                 SmtpServer.Send(mail);
+                return UserCreate;
             }
             catch (Exception ex)
             {
@@ -323,7 +328,7 @@ namespace Business_Logic.Modules.StaffModule
             }
         }
 
-        public async Task BanUser(Guid? UserBanID)
+        public async Task<User> BanUser(Guid? UserBanID)
         {
             try
             {
@@ -366,6 +371,7 @@ namespace Business_Logic.Modules.StaffModule
                 SmtpServer.EnableSsl = true;
 
                 SmtpServer.Send(mail);
+                return UserBan;
             }
             catch (Exception ex)
             {
@@ -374,7 +380,7 @@ namespace Business_Logic.Modules.StaffModule
             }
         }
 
-        public async Task UnbanUser(Guid? UserUnbanID)
+        public async Task<User> UnbanUser(Guid? UserUnbanID)
         {
             try
             {
@@ -417,6 +423,7 @@ namespace Business_Logic.Modules.StaffModule
                 SmtpServer.EnableSsl = true;
 
                 SmtpServer.Send(mail);
+                return UserUnban;
             }
             catch (Exception ex)
             {

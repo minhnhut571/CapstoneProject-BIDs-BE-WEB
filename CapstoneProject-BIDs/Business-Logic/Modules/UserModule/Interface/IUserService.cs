@@ -10,9 +10,9 @@ namespace Business_Logic.Modules.UserModule.Interface
 {
     public interface IUserService
     {
-        public Task<Guid?> AddNewUser(CreateUserRequest UserCreate);
+        public Task<User> AddNewUser(CreateUserRequest UserCreate);
 
-        public Task UpdateUser(UpdateUserRequest UserUpdate);
+        public Task<User> UpdateUser(UpdateUserRequest UserUpdate);
 
         public Task<ICollection<User>> GetAll();
 

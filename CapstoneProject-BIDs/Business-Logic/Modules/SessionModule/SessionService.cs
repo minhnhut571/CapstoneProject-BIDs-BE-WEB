@@ -83,20 +83,13 @@ namespace Business_Logic.Modules.SessionModule
         //    return Session;
         //}
 
-        public async Task<Guid?> AddNewSession(CreateSessionRequest SessionRequest)
+        public async Task<Session> AddNewSession(CreateSessionRequest SessionRequest)
         {
 
             ValidationResult result = new CreateSessionRequestValidator().Validate(SessionRequest);
             if (!result.IsValid)
             {
                 throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
-            }
-
-            Session SessionCheck = _SessionRepository.GetFirstOrDefaultAsync(x => x.SessionName == SessionRequest.SessionName).Result;
-
-            if (SessionCheck != null)
-            {
-                throw new Exception(ErrorMessage.SessionError.SESSION_EXISTED);
             }
 
             var newSession = new Session();
@@ -112,10 +105,10 @@ namespace Business_Logic.Modules.SessionModule
             newSession.Status = (int)SessionStatusEnum.NotStart;
 
             await _SessionRepository.AddAsync(newSession);
-            return newSession.SessionId;
+            return newSession;
         }
 
-        public async Task UpdateSession(UpdateSessionRequest SessionRequest)
+        public async Task<Session> UpdateSession(UpdateSessionRequest SessionRequest)
         {
             try
             {
@@ -148,6 +141,7 @@ namespace Business_Logic.Modules.SessionModule
                 SessionUpdate.Status = SessionRequest.Status;
 
                 await _SessionRepository.UpdateAsync(SessionUpdate);
+                return SessionUpdate;
             }
             catch (Exception ex)
             {
@@ -156,7 +150,7 @@ namespace Business_Logic.Modules.SessionModule
             }
         }
 
-        public async Task DeleteSession(Guid? SessionDeleteID)
+        public async Task<Session> DeleteSession(Guid? SessionDeleteID)
         {
             try
             {
@@ -174,6 +168,7 @@ namespace Business_Logic.Modules.SessionModule
 
                 SessionDelete.Status = (int)SessionStatusEnum.Delete;
                 await _SessionRepository.UpdateAsync(SessionDelete);
+                return SessionDelete;
             }
             catch (Exception ex)
             {
