@@ -24,7 +24,7 @@ namespace Business_Logic.Modules.StaffModule
 
         public async Task<ICollection<Staff>> GetAll()
         {
-            return await _StaffRepository.GetAll(options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+            return await _StaffRepository.GetAll(includeProperties: "Role", options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
         public Task<ICollection<Staff>> GetStaffsIsValid()

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Data_Access.Entities;
+﻿using AutoMapper;
+using BIDs_API.SignalR;
 using Business_Logic.Modules.ItemModule.Interface;
 using Business_Logic.Modules.ItemModule.Request;
-using BIDs_API.SignalR;
+using Business_Logic.Modules.ItemModule.Response;
+using Data_Access.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Business_Logic.Modules.ItemModule.Request;
 
 namespace BIDs_API.Controllers
 {
@@ -19,22 +14,29 @@ namespace BIDs_API.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly IItemService _ItemService;
-        private readonly IHubContext<ItemHub> _hubItemContext;
+        public readonly IMapper _mapper;
+        private readonly IHubContext<ItemHub> _hubContext;
 
         public ItemsController(IItemService ItemService
-            , IHubContext<ItemHub> hubItemContext)
+            , IMapper mapper
+            , IHubContext<ItemHub> hubContext)
         {
             _ItemService = ItemService;
-            _hubItemContext = hubItemContext;
+            _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Item>>> GetItemsForAdmin()
+        public async Task<ActionResult<IEnumerable<ItemResponseStaff>>> GetItemsForAdmin()
         {
             try
             {
-                var response = await _ItemService.GetAll();
+                var list = await _ItemService.GetAll();
+                var response = list.Select
+                           (
+                             emp => _mapper.Map<Item, ItemResponseStaff>(emp)
+                           );
                 if (response == null)
                 {
                     return NotFound();
@@ -49,9 +51,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetItemByID([FromRoute] Guid? id)
+        public async Task<ActionResult<ItemResponseStaff>> GetItemByID([FromRoute] Guid? id)
         {
-            var Item = await _ItemService.GetItemByID(id);
+            var Item = _mapper.Map<ItemResponseStaff>(await _ItemService.GetItemByID(id));
 
             if (Item == null)
             {
@@ -63,9 +65,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_name/{name}")]
-        public async Task<ActionResult<Item>> GetItemByName([FromRoute] string name)
+        public async Task<ActionResult<ItemResponse>> GetItemByName([FromRoute] string name)
         {
-            var Item = await _ItemService.GetItemByName(name);
+            var Item = _mapper.Map<ItemResponse>(await _ItemService.GetItemByName(name));
 
             if (Item == null)
             {
@@ -77,11 +79,15 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_type_name/{name}")]
-        public async Task<ActionResult<IEnumerable<Item>>> GetItemByTypeName([FromRoute] string name)
+        public async Task<ActionResult<IEnumerable<ItemResponseStaff>>> GetItemByTypeName([FromRoute] string name)
         {
             try
             {
-                var response = await _ItemService.GetItemByTypeName(name);
+                var list = await _ItemService.GetItemByTypeName(name);
+                var response = list.Select
+                           (
+                             emp => _mapper.Map<Item, ItemResponseStaff>(emp)
+                           );
                 if (response == null)
                 {
                     return NotFound();
@@ -96,11 +102,15 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_user/{id}")]
-        public async Task<ActionResult<IEnumerable<Item>>> GetItemByTypeName([FromRoute] Guid? id)
+        public async Task<ActionResult<IEnumerable<Item>>> GetItemByUser([FromRoute] Guid? id)
         {
             try
             {
-                var response = await _ItemService.GetItemByUserID(id);
+                var list = await _ItemService.GetItemByUserID(id);
+                var response = list.Select
+                           (
+                             emp => _mapper.Map<Item, ItemResponse>(emp)
+                           );
                 if (response == null)
                 {
                     return NotFound();
@@ -121,7 +131,7 @@ namespace BIDs_API.Controllers
             try
             {
                 var Item = await _ItemService.UpdateItem(updateItemRequest);
-                await _hubItemContext.Clients.All.SendAsync("ReceiveItemUpdate", Item);
+                await _hubContext.Clients.All.SendAsync("ReceiveItemUpdate", Item);
                 return Ok();
             }
             catch (Exception ex)
@@ -133,13 +143,13 @@ namespace BIDs_API.Controllers
         // POST api/<ValuesController>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Item>> PostItem([FromBody] CreateItemRequest createItemRequest)
+        public async Task<ActionResult<ItemResponse>> PostItem([FromBody] CreateItemRequest createItemRequest)
         {
             try
             {
                 var Item = await _ItemService.AddNewItem(createItemRequest);
-                await _hubItemContext.Clients.All.SendAsync("ReceiveItemAdd", Item);
-                return Ok(Item);
+                await _hubContext.Clients.All.SendAsync("ReceiveItemAdd", Item);
+                return Ok(_mapper.Map<ItemResponse>(Item));
             }
             catch (Exception ex)
             {
@@ -154,7 +164,7 @@ namespace BIDs_API.Controllers
             try
             {
                 var Item = await _ItemService.DeleteItem(id);
-                await _hubItemContext.Clients.All.SendAsync("ReceiveItemDelete", Item);
+                await _hubContext.Clients.All.SendAsync("ReceiveItemDelete", Item);
                 return Ok();
             }
             catch (Exception ex)

@@ -38,7 +38,7 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StaffResponse>>> GetStaffsForAdmin()
+        public async Task<ActionResult<IEnumerable<StaffResponseAdmin>>> GetStaffsForAdmin()
         {
             try
             {
@@ -46,7 +46,7 @@ namespace BIDs_API.Controllers
                 var list = await _StaffService.GetAll();
                 var response = list.Select
                            (
-                             emp => _mapper.Map<Staff, StaffResponse>(emp)
+                             emp => _mapper.Map<Staff, StaffResponseAdmin>(emp)
                            );
                 if (response == null)
                 {
@@ -89,9 +89,9 @@ namespace BIDs_API.Controllers
         }
 
         [HttpGet("by_account_name/{name}")]
-        public async Task<ActionResult<StaffResponse>> GetStaffByAccountName([FromRoute] string name)
+        public async Task<ActionResult<StaffResponseAdmin>> GetStaffByAccountName([FromRoute] string name)
         {
-            var Staff = _mapper.Map<StaffResponse>(await _StaffService.GetStaffByAccountName(name));
+            var Staff = _mapper.Map<StaffResponseAdmin>(await _StaffService.GetStaffByAccountName(name));
 
             if (Staff == null)
             {
@@ -121,13 +121,13 @@ namespace BIDs_API.Controllers
         // POST api/<ValuesController>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<StaffResponse>> PostStaff([FromBody] CreateStaffRequest createStaffRequest)
+        public async Task<ActionResult<StaffResponseAdmin>> PostStaff([FromBody] CreateStaffRequest createStaffRequest)
         {
             try
             {
                 var staff = await _StaffService.AddNewStaff(createStaffRequest);
                 await _hubStaffContext.Clients.All.SendAsync("ReceiveStaffAdd", staff);
-                return Ok(_mapper.Map<StaffResponse>(staff));
+                return Ok(_mapper.Map<StaffResponseAdmin>(staff));
             }
             catch (Exception ex)
             {

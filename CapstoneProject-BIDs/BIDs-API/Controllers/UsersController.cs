@@ -28,14 +28,14 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsersForAdmin()
+        public async Task<ActionResult<IEnumerable<UserResponseStaff>>> GetUsersForAdmin()
         {
             try
             {
                 var list = await _userService.GetAll();
                 var response = list.Select
                            (
-                             emp => _mapper.Map<User, UserResponse>(emp)
+                             emp => _mapper.Map<User, UserResponseStaff>(emp)
                            );
                 if (response == null)
                 {
@@ -51,14 +51,14 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>
         [HttpGet("get-active")]
-        public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsersActive()
+        public async Task<ActionResult<IEnumerable<UserResponseStaff>>> GetUsersActive()
         {
             try
             {
                 var list = await _userService.GetUsersIsActive();
                 var response = list.Select
                            (
-                             emp => _mapper.Map<User, UserResponse>(emp)
+                             emp => _mapper.Map<User, UserResponseStaff>(emp)
                            );
                 if (response == null)
                 {
@@ -74,14 +74,14 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>
         [HttpGet("get-waitting")]
-        public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsersWaitting()
+        public async Task<ActionResult<IEnumerable<UserResponseStaff>>> GetUsersWaitting()
         {
             try
             {
                 var list = await _userService.GetUsersIsWaitting();
                 var response = list.Select
                            (
-                             emp => _mapper.Map<User, UserResponse>(emp)
+                             emp => _mapper.Map<User, UserResponseStaff>(emp)
                            );
                 if (response == null)
                 {
@@ -97,14 +97,14 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>
         [HttpGet("get-ban")]
-        public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsersBan()
+        public async Task<ActionResult<IEnumerable<UserResponseStaff>>> GetUsersBan()
         {
             try
             {
                 var list = await _userService.GetUsersIsBan();
                 var response = list.Select
                            (
-                             emp => _mapper.Map<User, UserResponse>(emp)
+                             emp => _mapper.Map<User, UserResponseStaff>(emp)
                            );
                 if (response == null)
                 {
@@ -136,7 +136,7 @@ namespace BIDs_API.Controllers
         [HttpGet("by_name/{name}")]
         public async Task<ActionResult<UserResponse>> GetUserByName([FromRoute] string name)
         {
-            var user = _mapper.Map<UserResponse>(await _userService.GetUserByName(name)); ;
+            var user = _mapper.Map<UserResponse>(await _userService.GetUserByName(name));
 
             if (user == null)
             {
@@ -148,9 +148,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_account_name/{name}")]
-        public async Task<ActionResult<UserResponse>> GetUserByAccountName([FromRoute] string name)
+        public async Task<ActionResult<UserResponseStaff>> GetUserByAccountName([FromRoute] string name)
         {
-            var user = _mapper.Map<UserResponse>(await _userService.GetUserByAccountName(name)); ;
+            var user = _mapper.Map<UserResponseStaff>(await _userService.GetUserByAccountName(name));
 
             if (user == null)
             {

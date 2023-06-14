@@ -28,7 +28,7 @@ namespace Data_Access.Entities
                 context.Roles.Add(role1);
                 context.Roles.Add(role2);
             }
-
+            await context.SaveChangesAsync();
             // seed staff
             if (!context.Staffs.Any())
             {
@@ -46,7 +46,8 @@ namespace Data_Access.Entities
                     Phone = "0933403842",
                     RoleId = 1,
                     StaffName = "Seed Admin",
-                    Status = true
+                    Status = true,
+                    Role = context.Roles.FirstOrDefault(r => r.RoleId == 1)
                 };
                 var staff = new Staff()
                 {
@@ -62,7 +63,8 @@ namespace Data_Access.Entities
                     Phone = "0933403843",
                     RoleId = 2,
                     StaffName = "Staff seed",
-                    Status = true
+                    Status = true,
+                    Role = context.Roles.FirstOrDefault(r => r.RoleId == 2)
                 };
                 context.Staffs.Add(admin);
                 context.Staffs.Add(staff);

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Data_Access.Entities;
+﻿using AutoMapper;
+using BIDs_API.SignalR;
 using Business_Logic.Modules.ItemTypeModule.Interface;
 using Business_Logic.Modules.ItemTypeModule.Request;
-using BIDs_API.SignalR;
+using Business_Logic.Modules.ItemTypeModule.Response;
+using Data_Access.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BIDs_API.Controllers
@@ -18,21 +14,29 @@ namespace BIDs_API.Controllers
     public class ItemTypesController : ControllerBase
     {
         private readonly IItemTypeService _ItemTypeService;
-        private readonly IHubContext<ItemTypeHub> _hubItemTypeContext;
+        public readonly IMapper _mapper;
+        private readonly IHubContext<ItemTypeHub> _hubContext;
+
         public ItemTypesController(IItemTypeService ItemTypeService
-            , IHubContext<ItemTypeHub> hubItemTypeContext)
+            , IMapper mapper
+            , IHubContext<ItemTypeHub> hubContext)
         {
             _ItemTypeService = ItemTypeService;
-            _hubItemTypeContext = hubItemTypeContext;
+            _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ItemType>>> GetItemTypesForAdmin()
+        public async Task<ActionResult<IEnumerable<ItemTypeResponseStaff>>> GetItemTypesForAdmin()
         {
             try
             {
-                var response = await _ItemTypeService.GetAll();
+                var list = await _ItemTypeService.GetAll();
+                var response = list.Select
+                           (
+                             emp => _mapper.Map<ItemType, ItemTypeResponseStaff>(emp)
+                           );
                 if (response == null)
                 {
                     return NotFound();
@@ -47,9 +51,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ItemType>> GetItemTypeByID([FromRoute] Guid? id)
+        public async Task<ActionResult<ItemTypeResponseStaff>> GetItemTypeByID([FromRoute] Guid? id)
         {
-            var ItemType = await _ItemTypeService.GetItemTypeByID(id);
+            var ItemType = _mapper.Map<ItemTypeResponseStaff>(await _ItemTypeService.GetItemTypeByID(id));
 
             if (ItemType == null)
             {
@@ -61,9 +65,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_name/{name}")]
-        public async Task<ActionResult<ItemType>> GetItemTypeByName([FromRoute] string name)
+        public async Task<ActionResult<ItemTypeResponseStaff>> GetItemTypeByName([FromRoute] string name)
         {
-            var ItemType = await _ItemTypeService.GetItemTypeByName(name);
+            var ItemType = _mapper.Map<ItemTypeResponseStaff>(await _ItemTypeService.GetItemTypeByName(name));
 
             if (ItemType == null)
             {
@@ -81,7 +85,7 @@ namespace BIDs_API.Controllers
             try
             {
                 var ItemType = await _ItemTypeService.UpdateItemType(updateItemTypeRequest);
-                await _hubItemTypeContext.Clients.All.SendAsync("ReceiveItemTypeUpdate", ItemType);
+                await _hubContext.Clients.All.SendAsync("ReceiveItemTypeUpdate", ItemType);
                 return Ok();
             }
             catch (Exception ex)
@@ -93,13 +97,13 @@ namespace BIDs_API.Controllers
         // POST api/<ValuesController>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ItemType>> PostItemType([FromBody] CreateItemTypeRequest createItemTypeRequest)
+        public async Task<ActionResult<ItemTypeResponseStaff>> PostItemType([FromBody] CreateItemTypeRequest createItemTypeRequest)
         {
             try
             {
                 var ItemType = await _ItemTypeService.AddNewItemType(createItemTypeRequest);
-                await _hubItemTypeContext.Clients.All.SendAsync("ReceiveItemTypeAdd", ItemType);
-                return Ok(ItemType);
+                await _hubContext.Clients.All.SendAsync("ReceiveItemTypeAdd", ItemType);
+                return Ok(_mapper.Map<ItemTypeResponseStaff>(ItemType));
             }
             catch (Exception ex)
             {
@@ -114,7 +118,7 @@ namespace BIDs_API.Controllers
             try
             {
                 var ItemType = await _ItemTypeService.DeleteItemType(id);
-                await _hubItemTypeContext.Clients.All.SendAsync("ReceiveItemTypeDelete", ItemType);
+                await _hubContext.Clients.All.SendAsync("ReceiveItemTypeDelete", ItemType);
                 return Ok();
             }
             catch (Exception ex)

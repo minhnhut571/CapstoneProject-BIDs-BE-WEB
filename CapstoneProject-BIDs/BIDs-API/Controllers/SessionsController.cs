@@ -10,7 +10,8 @@ using Business_Logic.Modules.SessionModule.Interface;
 using Business_Logic.Modules.SessionModule.Request;
 using BIDs_API.SignalR;
 using Microsoft.AspNetCore.SignalR;
-using Business_Logic.Modules.SessionModule.Request;
+using Business_Logic.Modules.SessionModule.Response;
+using AutoMapper;
 
 namespace BIDs_API.Controllers
 {
@@ -20,21 +21,28 @@ namespace BIDs_API.Controllers
     {
         private readonly ISessionService _SessionService;
         private readonly IHubContext<SessionHub> _hubSessionContext;
+        private readonly IMapper _mapper;
 
         public SessionsController(ISessionService SessionService
-            , IHubContext<SessionHub> hubSessionContext)
+            , IHubContext<SessionHub> hubSessionContext
+            , IMapper mapper)
         {
             _SessionService = SessionService;
             _hubSessionContext = hubSessionContext;
+            _mapper = mapper;
         }
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Session>>> GetSessionsForAdmin()
+        public async Task<ActionResult<IEnumerable<SessionResponseStaff>>> GetSessionsForAdmin()
         {
             try
             {
-                var response = await _SessionService.GetAll();
+                var list = await _SessionService.GetAll();
+                var response = list.Select
+                           (
+                             emp => _mapper.Map<Session, SessionResponseStaff>(emp)
+                           );
                 if (response == null)
                 {
                     return NotFound();
@@ -49,9 +57,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Session>> GetSessionByID([FromRoute] Guid? id)
+        public async Task<ActionResult<SessionResponse>> GetSessionByID([FromRoute] Guid? id)
         {
-            var Session = await _SessionService.GetSessionByID(id);
+            var Session = _mapper.Map<SessionResponse>(await _SessionService.GetSessionByID(id));
 
             if (Session == null)
             {
@@ -63,9 +71,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_name/{name}")]
-        public async Task<ActionResult<Session>> GetSessionByName([FromRoute] string name)
+        public async Task<ActionResult<SessionResponse>> GetSessionByName([FromRoute] string name)
         {
-            var Session = await _SessionService.GetSessionByName(name);
+            var Session = _mapper.Map<SessionResponse>(await _SessionService.GetSessionByName(name));
 
             if (Session == null)
             {
@@ -95,13 +103,13 @@ namespace BIDs_API.Controllers
         // POST api/<ValuesController>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Session>> PostSession([FromBody] CreateSessionRequest createSessionRequest)
+        public async Task<ActionResult<SessionResponseStaff>> PostSession([FromBody] CreateSessionRequest createSessionRequest)
         {
             try
             {
                 var Session = await _SessionService.AddNewSession(createSessionRequest);
                 await _hubSessionContext.Clients.All.SendAsync("ReceiveSessionAdd", Session);
-                return Ok(Session);
+                return Ok(_mapper.Map<SessionResponseStaff>(Session));
             }
             catch (Exception ex)
             {

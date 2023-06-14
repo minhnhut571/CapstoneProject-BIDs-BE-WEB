@@ -41,6 +41,8 @@ namespace Business_Logic.Modules.StaffModule
                 }
             }
 
+            query = query.Include(s => s.Role);
+
             return options != null ? options(query).ToList() : await query.ToListAsync();
         }
     }
