@@ -36,11 +36,19 @@
         }
         #endregion
 
-        #region Role error message
-        public static class RoleError
+        #region Admin error message
+        public static class AdminError
         {
-            public readonly static string ROLE_NOT_FOUND = "Quyền không tài tại";
-            public readonly static string ROLE_EXISTED = "Quyền đã tồn tại";
+            public readonly static string ADMIN_NOT_FOUND = "Quản trị viên không tồn tại";
+            public readonly static string ADMIN_EXISTED = "Quản trị viên đã tồn tại";
+        }
+        #endregion
+
+        #region Fee error message
+        public static class FeeError
+        {
+            public readonly static string FEE_NOT_FOUND = "Bảng giá không tài tại";
+            public readonly static string FEE_EXISTED = "Bảng giá đã tồn tại";
         }
         #endregion
 
@@ -51,11 +59,19 @@
         }
         #endregion
 
-        #region ItemType error message
-        public static class ItemTypeError
+        #region Category error message
+        public static class CategoryError
         {
-            public readonly static string ITEM_TYPE_NOT_FOUND = "Loại sản phẩm không tồn tại";
-            public readonly static string ITEM_TYPE_EXISTED = "Loại sản phẩm đã tồn tài";
+            public readonly static string CATEGORY_NOT_FOUND = "Loại sản phẩm không tồn tại";
+            public readonly static string CATEGORY_EXISTED = "Loại sản phẩm đã tồn tài";
+        }
+        #endregion
+
+        #region Description error message
+        public static class DescriptionError
+        {
+            public readonly static string DESCRIPTION_NOT_FOUND = "Chi tiết cho sản phầm không tồn tại";
+            public readonly static string DESCRIPTION_EXISTED = "Chi tiết cho sản phẩm đã tồn tài";
         }
         #endregion
 

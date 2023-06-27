@@ -8,7 +8,7 @@ namespace Business_Logic.Modules.SessionModule.Request
     {
         public Guid? SessionID { get; set; }
         [Required]
-        public Guid? ItemId { get; set; }
+        public int FeeId { get; set; }
         public string SessionName { get; set; }
         public DateTime BeginTime { get; set; }
         public DateTime AuctionTime { get; set; }
@@ -21,7 +21,7 @@ namespace Business_Logic.Modules.SessionModule.Request
         public UpdateSessionRequestValidator()
         {
             RuleFor(x => x.SessionID).NotEmpty().NotNull();
-            RuleFor(x => x.ItemId).NotEmpty().NotNull();
+            RuleFor(x => x.FeeId).NotEmpty().NotNull();
             RuleFor(x => x.SessionName).NotEmpty().NotNull();
             RuleFor(x => x.BeginTime).NotEmpty().NotNull();
             RuleFor(x => x.AuctionTime).NotEmpty().NotNull();

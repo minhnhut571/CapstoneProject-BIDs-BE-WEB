@@ -9,7 +9,6 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Business_Logic.Modules.StaffModule.Interface;
 using Business_Logic.Modules.UserModule.Interface;
-using Business_Logic.Modules.RoleModule.Interface;
 
 namespace BIDs_API.Controllers
 {
@@ -21,18 +20,15 @@ namespace BIDs_API.Controllers
         private readonly IConfiguration _configuration;
         private readonly IStaffService _staffService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
         public LoginController(ILoginService LoginService
             , IConfiguration configuration
             , IStaffService staffService
-            , IUserService userService
-            , IRoleService roleService)
+            , IUserService userService)
         {
             _LoginService = LoginService;
             _configuration = configuration;
             _staffService = staffService;
             _userService = userService;
-            _roleService = roleService;
         }
 
 
@@ -41,7 +37,7 @@ namespace BIDs_API.Controllers
         {
             var result = _LoginService.LoginUser(login);
 
-            if(result == false)
+            if(result == null)
                 return BadRequest(new LoginRespone { Successful = false, Error = "Sai tài khoản hoặc mật khẩu"});
 
             var jwtToken = new JwtSecurityTokenHandler();
@@ -55,7 +51,8 @@ namespace BIDs_API.Controllers
                  {
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
 
-                    new Claim("UserName", string.Join(",", login.AccountName))
+                    new Claim("Email", string.Join(",", login.Email)),
+                    new Claim("Role", string.Join(",", result.Role))
 
                 }),
                 Expires = expiry,
@@ -84,8 +81,8 @@ namespace BIDs_API.Controllers
                  {
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
 
-                    new Claim("StaffName", string.Join(",", login.AccountName)),
-                    new Claim("RoleID", string.Join(",", result.RoleId)),
+                    new Claim("Email", string.Join(",", login.Email)),
+                    new Claim("Role", string.Join(",", result)),
 
                 }),
                 Expires = expiry,
@@ -95,7 +92,7 @@ namespace BIDs_API.Controllers
             return Ok(new LoginRespone { Successful = true, Token = new JwtSecurityTokenHandler().WriteToken(token) });
         }
 
-        [HttpPost("decrypttoken-staff")]
+        [HttpPost("decrypttoken")]
         public async Task<IActionResult> DecryptTokenForStaff([FromHeader]string token)
         {
             if (token != null)
@@ -113,68 +110,29 @@ namespace BIDs_API.Controllers
 
                 var readToken = claims;
                 var respone = readToken.Claims;
-                var staffName = "";
-                int roleId = new int();
+                var email = "";
+                var role = "";
                 foreach (var x in respone)
                 {
                     switch (x.Type)
                     {
-                        case "StaffName":
-                            staffName = x.Value;
+                        case "Email":
+                            email = x.Value;
                             break;
-                        case "RoleID":
-                            roleId = int.Parse(x.Value);
+                        case "Role":
+                            role = x.Value;
                             break;
                     }
                 }
-                var staff = await _staffService.GetStaffByAccountName(staffName);
-                var role = await _roleService.GetRoleByID(roleId);
                 return Ok(new
                 {
-                    Staff = staff,
+                    Email = email,
                     Role = role
                 });
             }
             return BadRequest();
         }
 
-        [HttpPost("decrypttoken-user")]
-        public async Task<IActionResult> DecryptTokenForUser([FromHeader] string token)
-        {
-            
-            if (token != null)
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                //Decode JWT
-                var claims = tokenHandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecurityKey"])),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);
-
-                var readToken = claims;
-                var respone = readToken.Claims;
-                var username = "";
-                foreach (var x in respone)
-                {
-                    switch (x.Type)
-                    {
-                        case "UserName":
-                            username = x.Value;
-                            break;
-                    }
-                }
-                var user = await _userService.GetUserByAccountName(username);
-                return Ok(new
-                {
-                    User = user,
-                });
-            }
-            return BadRequest();
-        }
 
 
         // PUT api/<ValuesController>/5

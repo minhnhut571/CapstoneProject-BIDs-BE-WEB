@@ -22,7 +22,7 @@ namespace Business_Logic.Modules.StaffModule.Interface
 
         public Task<Staff> GetStaffByName(string Name);
 
-        public Task<Staff> GetStaffByAccountName(string Name);
+        public Task<Staff> GetStaffByEmail(string Email);
 
         public Task<User> AcceptCreateAccount(Guid? CreateAccountID);
 

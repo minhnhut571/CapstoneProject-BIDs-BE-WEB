@@ -1,5 +1,5 @@
-﻿using Business_Logic.Modules.ItemTypeModule;
-using Business_Logic.Modules.ItemTypeModule.Interface;
+﻿using Business_Logic.Modules.CategoryModule;
+using Business_Logic.Modules.CategoryModule.Interface;
 using Business_Logic.Modules.SessionModule.Interface;
 using Business_Logic.Modules.SessionModule.Request;
 using Business_Logic.Modules.UserModule.Interface;
@@ -7,22 +7,23 @@ using Data_Access.Constant;
 using Data_Access.Entities;
 using Data_Access.Enum;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Business_Logic.Modules.SessionModule
 {
     public class SessionService : ISessionService
     {
         private readonly ISessionRepository _SessionRepository;
-        private readonly IItemTypeRepository _ItemTypeRepository;
-        public SessionService(ISessionRepository SessionRepository, IItemTypeRepository ItemTypeRepository)
+        private readonly ICategoryRepository _CategoryRepository;
+        public SessionService(ISessionRepository SessionRepository, ICategoryRepository CategoryRepository)
         {
             _SessionRepository = SessionRepository;
-            _ItemTypeRepository = ItemTypeRepository;
+            _CategoryRepository = CategoryRepository;
         }
 
         public async Task<ICollection<Session>> GetAll()
         {
-            return await _SessionRepository.GetAll(options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+            return await _SessionRepository.GetAll(includeProperties: "Fee", options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
         public async Task<ICollection<Session>> GetSessionsIsNotStart()
@@ -40,13 +41,23 @@ namespace Business_Logic.Modules.SessionModule
             return await _SessionRepository.GetSessionsBy(x => x.Status == (int)SessionStatusEnum.Complete, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
+        public async Task<ICollection<Session>> GetSessionsIsHaventPay()
+        {
+            return await _SessionRepository.GetSessionsBy(x => x.Status == (int)SessionStatusEnum.HaventTranferYet, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+        }
+
+        public async Task<ICollection<Session>> GetSessionsIsOutOfDate()
+        {
+            return await _SessionRepository.GetSessionsBy(x => x.Status == (int)SessionStatusEnum.OutOfDate, options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+        }
+
         public async Task<Session> GetSessionByID(Guid? id)
         {
             if (id == null)
             {
                 throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
             }
-            var Session = await _SessionRepository.GetFirstOrDefaultAsync(x => x.SessionId == id);
+            var Session = await _SessionRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (Session == null)
             {
                 throw new Exception(ErrorMessage.SessionError.SESSION_NOT_FOUND);
@@ -60,7 +71,7 @@ namespace Business_Logic.Modules.SessionModule
             {
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
-            var Session = await _SessionRepository.GetFirstOrDefaultAsync(x => x.SessionName == SessionName);
+            var Session = await _SessionRepository.GetFirstOrDefaultAsync(x => x.Name == SessionName);
             if (Session == null)
             {
                 throw new Exception(ErrorMessage.SessionError.SESSION_NOT_FOUND);
@@ -68,14 +79,14 @@ namespace Business_Logic.Modules.SessionModule
             return Session;
         }
 
-        //public async Task<Session> GetSessionByType(string itemType)
+        //public async Task<Session> GetSessionByType(string Category)
         //{
-        //    if (itemType == null)
+        //    if (Category == null)
         //    {
         //        throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
         //    }
-        //    var type = _ItemTypeRepository.GetFirstOrDefaultAsync(x => x.ItemTypeName == itemType).Result;
-        //    var Session = await _SessionRepository.GetFirstOrDefaultAsync(x => x.ItemTypeId == type.ItemTypeId);
+        //    var type = _CategoryRepository.GetFirstOrDefaultAsync(x => x.CategoryName == Category).Result;
+        //    var Session = await _SessionRepository.GetFirstOrDefaultAsync(x => x.CategoryId == type.CategoryId);
         //    if (Session == null)
         //    {
         //        throw new Exception(ErrorMessage.SessionError.SESSION_NOT_FOUND);
@@ -94,9 +105,9 @@ namespace Business_Logic.Modules.SessionModule
 
             var newSession = new Session();
 
-            newSession.SessionId = Guid.NewGuid();
-            newSession.SessionName = SessionRequest.SessionName;
-            newSession.ItemId = SessionRequest.ItemId;
+            newSession.Id = Guid.NewGuid();
+            newSession.Name = SessionRequest.SessionName;
+            newSession.FeeId = SessionRequest.FeeId;
             newSession.BeginTime = SessionRequest.BeginTime;
             newSession.AuctionTime = SessionRequest.AuctionTime;
             newSession.EndTime = SessionRequest.EndTime;
@@ -125,15 +136,15 @@ namespace Business_Logic.Modules.SessionModule
                     throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
                 }
 
-                Session SessionCheck = _SessionRepository.GetFirstOrDefaultAsync(x => x.SessionName == SessionRequest.SessionName).Result;
+                Session SessionCheck = _SessionRepository.GetFirstOrDefaultAsync(x => x.Name == SessionRequest.SessionName).Result;
 
                 if (SessionCheck != null)
                 {
                     throw new Exception(ErrorMessage.SessionError.SESSION_EXISTED);
                 }
 
-                SessionUpdate.SessionName = SessionRequest.SessionName;
-                SessionUpdate.ItemId = SessionRequest.ItemId;
+                SessionUpdate.Name = SessionRequest.SessionName;
+                SessionUpdate.FeeId = SessionRequest.FeeId;
                 SessionUpdate.BeginTime = SessionRequest.BeginTime;
                 SessionUpdate.AuctionTime = SessionRequest.AuctionTime;
                 SessionUpdate.EndTime = SessionRequest.EndTime;
@@ -159,7 +170,7 @@ namespace Business_Logic.Modules.SessionModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                Session SessionDelete = _SessionRepository.GetFirstOrDefaultAsync(x => x.SessionId == SessionDeleteID && x.Status != (int)SessionStatusEnum.Delete).Result;
+                Session SessionDelete = _SessionRepository.GetFirstOrDefaultAsync(x => x.Id == SessionDeleteID && x.Status != (int)SessionStatusEnum.Delete).Result;
 
                 if (SessionDelete == null)
                 {

@@ -146,19 +146,19 @@ namespace BIDs_API.Controllers
             return user;
         }
 
-        // GET api/<ValuesController>/abc
-        [HttpGet("by_account_name/{name}")]
-        public async Task<ActionResult<UserResponseStaff>> GetUserByAccountName([FromRoute] string name)
-        {
-            var user = _mapper.Map<UserResponseStaff>(await _userService.GetUserByAccountName(name));
+        //// GET api/<ValuesController>/abc
+        //[HttpGet("by_account_name/{name}")]
+        //public async Task<ActionResult<UserResponseStaff>> GetUserByAccountName([FromRoute] string name)
+        //{
+        //    var user = _mapper.Map<UserResponseStaff>(await _userService.GetUserByAccountName(name));
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return user;
-        }
+        //    return user;
+        //}
 
         // PUT api/<ValuesController>/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

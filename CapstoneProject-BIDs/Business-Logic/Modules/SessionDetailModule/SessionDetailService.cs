@@ -1,5 +1,5 @@
-﻿using Business_Logic.Modules.ItemTypeModule;
-using Business_Logic.Modules.ItemTypeModule.Interface;
+﻿using Business_Logic.Modules.CategoryModule;
+using Business_Logic.Modules.CategoryModule.Interface;
 using Business_Logic.Modules.SessionDetailModule.Interface;
 using Business_Logic.Modules.SessionDetailModule.Request;
 using Business_Logic.Modules.UserModule.Interface;
@@ -13,16 +13,16 @@ namespace Business_Logic.Modules.SessionDetailModule
     public class SessionDetailService : ISessionDetailService
     {
         private readonly ISessionDetailRepository _SessionDetailRepository;
-        private readonly IItemTypeRepository _ItemTypeRepository;
-        public SessionDetailService(ISessionDetailRepository SessionDetailRepository, IItemTypeRepository ItemTypeRepository)
+        private readonly ICategoryRepository _CategoryRepository;
+        public SessionDetailService(ISessionDetailRepository SessionDetailRepository, ICategoryRepository CategoryRepository)
         {
             _SessionDetailRepository = SessionDetailRepository;
-            _ItemTypeRepository = ItemTypeRepository;
+            _CategoryRepository = CategoryRepository;
         }
 
         public async Task<ICollection<SessionDetail>> GetAll()
         {
-            return await _SessionDetailRepository.GetAll();
+            return await _SessionDetailRepository.GetAll(includeProperties: "User,Session");
         }
 
         public async Task<ICollection<SessionDetail>> GetSessionDetailIsActive()
@@ -41,7 +41,7 @@ namespace Business_Logic.Modules.SessionDetailModule
             {
                 throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
             }
-            var SessionDetail = await _SessionDetailRepository.GetFirstOrDefaultAsync(x => x.SessionId == id);
+            var SessionDetail = await _SessionDetailRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (SessionDetail == null)
             {
                 throw new Exception(ErrorMessage.AuctionHistoryError.AUCTION_HISTORY_NOT_FOUND);
@@ -77,14 +77,14 @@ namespace Business_Logic.Modules.SessionDetailModule
             return SessionDetail;
         }
 
-        //public async Task<SessionDetail> GetSessionDetailByType(string itemType)
+        //public async Task<SessionDetail> GetSessionDetailByType(string Category)
         //{
-        //    if (itemType == null)
+        //    if (Category == null)
         //    {
         //        throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
         //    }
-        //    var type = _ItemTypeRepository.GetFirstOrDefaultAsync(x => x.ItemTypeName == itemType).Result;
-        //    var SessionDetail = await _SessionDetailRepository.GetFirstOrDefaultAsync(x => x.ItemTypeId == type.ItemTypeId);
+        //    var type = _CategoryRepository.GetFirstOrDefaultAsync(x => x.CategoryName == Category).Result;
+        //    var SessionDetail = await _SessionDetailRepository.GetFirstOrDefaultAsync(x => x.CategoryId == type.CategoryId);
         //    if (SessionDetail == null)
         //    {
         //        throw new Exception(ErrorMessage.SessionDetailError.SessionDetail_NOT_FOUND);
@@ -104,7 +104,7 @@ namespace Business_Logic.Modules.SessionDetailModule
 
             var newSessionDetail = new SessionDetail();
 
-            newSessionDetail.SessionDetailId = Guid.NewGuid();
+            newSessionDetail.Id = Guid.NewGuid();
             newSessionDetail.UserId = SessionDetailRequest.UserId;
             newSessionDetail.SessionId = SessionDetailRequest.SessionId;
             newSessionDetail.Price = SessionDetailRequest.Price;
@@ -153,7 +153,7 @@ namespace Business_Logic.Modules.SessionDetailModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                SessionDetail SessionDetailDelete = _SessionDetailRepository.GetFirstOrDefaultAsync(x => x.SessionDetailId == SessionDetailDeleteID && x.Status == true).Result;
+                SessionDetail SessionDetailDelete = _SessionDetailRepository.GetFirstOrDefaultAsync(x => x.Id == SessionDetailDeleteID && x.Status == true).Result;
 
                 if (SessionDetailDelete == null)
                 {

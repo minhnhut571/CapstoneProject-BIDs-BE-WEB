@@ -17,8 +17,8 @@ namespace Business_Logic.Modules.LoginModule.InterFace
         //public Task<bool> Login(Login login);
         //public Task<TokenModel> GenerateToken(LoginRespone account);
         //public ClaimsPrincipal EncrypToken(string token);
-        public bool LoginUser(LoginRequest loginRequest);
-        public Staff LoginStaff(LoginRequest loginRequest);
+        public User LoginUser(LoginRequest loginRequest);
+        public string LoginStaff(LoginRequest loginRequest);
         public ClaimsPrincipal EncrypToken(string Token);
         public Task ResetPassword(string email);
         public Task sendemail(string email);

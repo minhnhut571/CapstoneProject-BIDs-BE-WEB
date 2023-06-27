@@ -28,5 +28,8 @@ namespace Business_Logic.Modules.SessionModule.Interface
 
         public Task<ICollection<Session>> GetSessionsIsComplete();
 
+        public Task<ICollection<Session>> GetSessionsIsHaventPay();
+
+        public Task<ICollection<Session>> GetSessionsIsOutOfDate();
     }
 }

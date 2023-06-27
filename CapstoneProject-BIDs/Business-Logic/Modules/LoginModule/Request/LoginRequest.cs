@@ -1,18 +1,12 @@
-﻿using Business_Logic.Modules.RoleModule.Request;
-using FluentValidation;
-using System;
-using System.Collections.Generic;
+﻿using FluentValidation;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business_Logic.Modules.LoginModule.Request
 {
     public class LoginRequest
     {
         [Required]
-        public string AccountName { get; set; }
+        public string Email { get; set; }
         [Required]
         public string Password { get; set; }
     }
@@ -21,7 +15,7 @@ namespace Business_Logic.Modules.LoginModule.Request
     {
         public LoginRequestValidator()
         {
-            RuleFor(x => x.AccountName).NotEmpty().NotNull();
+            RuleFor(x => x.Email).NotEmpty().NotNull();
             RuleFor(x => x.Password).NotEmpty().NotNull();
         }
     }

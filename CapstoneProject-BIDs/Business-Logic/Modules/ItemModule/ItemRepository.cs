@@ -41,6 +41,9 @@ namespace Business_Logic.Modules.ItemModule
                 }
             }
 
+            query = query.Include(s => s.User);
+            query = query.Include(s => s.Category);
+
             return options != null ? options(query).ToList() : await query.ToListAsync();
         }
     }

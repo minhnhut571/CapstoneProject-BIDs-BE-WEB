@@ -46,7 +46,7 @@ namespace Business_Logic.Modules.UserModule
             {
                 throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
             }
-            var user = await _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == id);
+            var user = await _UserRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
             {
                 throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
@@ -60,7 +60,7 @@ namespace Business_Logic.Modules.UserModule
             {
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
-            var user = await _UserRepository.GetFirstOrDefaultAsync(x => x.UserName == userName);
+            var user = await _UserRepository.GetFirstOrDefaultAsync(x => x.Name == userName);
             if (user == null)
             {
                 throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
@@ -68,13 +68,13 @@ namespace Business_Logic.Modules.UserModule
             return user;
         }
 
-        public async Task<User> GetUserByAccountName(string accountName)
+        public async Task<User> GetUserByEmail(string email)
         {
-            if (accountName == null)
+            if (email == null)
             {
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
-            var user = await _UserRepository.GetFirstOrDefaultAsync(x => x.AccountName == accountName);
+            var user = await _UserRepository.GetFirstOrDefaultAsync(x => x.Email == email);
             if (user == null)
             {
                 throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
@@ -91,11 +91,6 @@ namespace Business_Logic.Modules.UserModule
                 throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
             }
 
-            User userCheckAccountName = _UserRepository.GetFirstOrDefaultAsync(x => x.AccountName == userRequest.AccountName).Result;
-            if (userCheckAccountName != null)
-            {
-                throw new Exception(ErrorMessage.CommonError.ACCOUNT_NAME_IS_EXITED);
-            }
             User userCheckEmail = _UserRepository.GetFirstOrDefaultAsync(x => x.Email == userRequest.Email).Result;
             if (userCheckEmail != null)
             {
@@ -133,9 +128,10 @@ namespace Business_Logic.Modules.UserModule
 
             var newUser = new User();
 
-            newUser.UserId = Guid.NewGuid();
-            newUser.AccountName = userRequest.AccountName;
-            newUser.UserName = userRequest.UserName;
+            newUser.Id = Guid.NewGuid();
+            newUser.Name = userRequest.UserName;
+            newUser.Avatar = userRequest.UserName;
+            newUser.Role = (int)RoleEnum.Bidder;
             newUser.Email = userRequest.Email;
             newUser.Password = userRequest.Password;
             newUser.Address = userRequest.Address;
@@ -146,7 +142,6 @@ namespace Business_Logic.Modules.UserModule
             newUser.CccdbackImage = userRequest.CccdbackImage;
             newUser.CreateDate = DateTime.Now;
             newUser.UpdateDate = DateTime.Now;
-            newUser.Notification = "Chưa được chấp thuận";
             newUser.Status = (int)UserStatusEnum.Waitting;
 
             await _UserRepository.AddAsync(newUser);
@@ -195,11 +190,12 @@ namespace Business_Logic.Modules.UserModule
                     throw new Exception(ErrorMessage.CommonError.WRONG_PHONE_FORMAT);
                 }
 
-                userUpdate.UserName = userRequest.UserName;
+                userUpdate.Name = userRequest.UserName;
                 userUpdate.Password = userRequest.Password;
                 userUpdate.Email = userRequest.Email;
                 userUpdate.Address = userRequest.Address;
                 userUpdate.Phone = userRequest.Phone;
+                userUpdate.Avatar = userRequest.Avatar;
                 //userUpdate.Status = userRequest.Status;
                 userUpdate.UpdateDate = DateTime.Now;
 

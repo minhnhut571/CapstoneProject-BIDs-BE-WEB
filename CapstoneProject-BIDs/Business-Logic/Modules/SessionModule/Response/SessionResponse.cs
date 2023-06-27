@@ -10,7 +10,7 @@ namespace Business_Logic.Modules.SessionModule.Response
 {
     public class SessionResponse
     {
-        public string ItemName { get; set; }
+        public string FeeName { get; set; }
         public string SessionName { get; set; }
         public DateTime BeginTime { get; set; }
         public DateTime AuctionTime { get; set; }

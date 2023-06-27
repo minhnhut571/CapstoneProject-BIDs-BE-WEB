@@ -1,7 +1,6 @@
 ﻿using Azure.Messaging;
 using Business_Logic.Modules.LoginModule.InterFace;
 using Business_Logic.Modules.LoginModule.Request;
-using Business_Logic.Modules.RoleModule.Interface;
 using Business_Logic.Modules.StaffModule.Interface;
 using Business_Logic.Modules.UserModule.Interface;
 using Data_Access.Constant;
@@ -17,6 +16,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Business_Logic.Modules.LoginModule.Data;
 using Microsoft.Extensions.Configuration;
+using Business_Logic.Modules.AdminModule.Interface;
 
 namespace Business_Logic.Modules.LoginModule
 {
@@ -24,19 +24,19 @@ namespace Business_Logic.Modules.LoginModule
     {
         private readonly IUserRepository _UserRepository;
         private readonly IStaffRepository _StaffRepository;
-        private readonly IRoleRepository _RoleRepository;
+        private readonly IAdminRepository _AdminRepository;
         private readonly IConfiguration _configuration;
         public LoginService(IUserRepository UserRepository
             , IStaffRepository StaffRepository
-            , IRoleRepository RoleRepository
-            , IConfiguration configuration)
+            , IConfiguration configuration
+            , IAdminRepository adminRepository)
         {
             _UserRepository = UserRepository;
             _StaffRepository = StaffRepository;
-            _RoleRepository = RoleRepository;
             _configuration = configuration;
+            _AdminRepository = adminRepository;
         }
-        public bool LoginUser(LoginRequest loginRequest)
+        public User LoginUser(LoginRequest loginRequest)
         {
             ValidationResult result = new LoginRequestValidator().Validate(loginRequest);
             if (!result.IsValid)
@@ -44,17 +44,17 @@ namespace Business_Logic.Modules.LoginModule
                 throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
             }
 
-            var UserCheckLogin =  _UserRepository.GetFirstOrDefaultAsync(x => x.AccountName == loginRequest.AccountName
+            var UserCheckLogin =  _UserRepository.GetFirstOrDefaultAsync(x => x.Email == loginRequest.Email
             && x.Password == loginRequest.Password).Result;
 
             if (UserCheckLogin == null )
             {
                 throw new Exception(ErrorMessage.LoginError.WRONG_ACCOUNT_NAME_OR_PASSWORD);
             }
-            return true;
+            return UserCheckLogin;
         }
 
-        public Staff LoginStaff(LoginRequest loginRequest)
+        public string LoginStaff(LoginRequest loginRequest)
         {
             ValidationResult result = new LoginRequestValidator().Validate(loginRequest);
             if (!result.IsValid)
@@ -62,14 +62,19 @@ namespace Business_Logic.Modules.LoginModule
                 throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
             }
 
-            var StaffCheckLogin = _StaffRepository.GetFirstOrDefaultAsync(x => x.AccountName == loginRequest.AccountName
+            var StaffCheckLogin = _StaffRepository.GetFirstOrDefaultAsync(x => x.Email == loginRequest.Email
             && x.Password == loginRequest.Password).Result;
-
-            if (StaffCheckLogin == null)
+            var AdminCheckLogin = _AdminRepository.GetFirstOrDefaultAsync(x => x.Email == loginRequest.Email
+            && x.Password == loginRequest.Password).Result;
+            if (StaffCheckLogin != null)
             {
-                throw new Exception(ErrorMessage.LoginError.WRONG_ACCOUNT_NAME_OR_PASSWORD);
+                return "Staff";
             }
-            return StaffCheckLogin;
+            if (AdminCheckLogin != null)
+            {
+                return "Admin";
+            }
+            throw new Exception(ErrorMessage.LoginError.WRONG_ACCOUNT_NAME_OR_PASSWORD);
         }
 
         public ClaimsPrincipal EncrypToken(string token)
@@ -118,13 +123,13 @@ namespace Business_Logic.Modules.LoginModule
 
                 if(userReset != null)
                 {
-                    content = "Mật khẩu mới cho tài khoản đăng nhập " + userReset.AccountName + " : " + randomPassword + ".\r\nĐường link quay lại trang đăng nhập: ";
+                    content = "Mật khẩu mới cho tài khoản đăng nhập " + userReset.Email + " : " + randomPassword + ".\r\nĐường link quay lại trang đăng nhập: ";
                     userReset.Password = randomPassword;
                     await _UserRepository.UpdateAsync(userReset);
                 }
                 else
                 {
-                    content = "Mật khẩu mới cho tài khoản đăng nhập " + staffReset.AccountName + " : " + randomPassword + ".\r\nĐường link quay lại trang đăng nhập: ";
+                    content = "Mật khẩu mới cho tài khoản đăng nhập " + staffReset.Email + " : " + randomPassword + ".\r\nĐường link quay lại trang đăng nhập: ";
                     staffReset.Password = randomPassword;
                     await _StaffRepository.UpdateAsync(staffReset);
                 }

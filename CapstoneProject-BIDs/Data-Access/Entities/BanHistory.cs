@@ -7,7 +7,7 @@ namespace Data_Access.Entities
 {
     public partial class BanHistory
     {
-        public Guid BanId { get; set; }
+        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public string Reason { get; set; }
         public DateTime UpdateDate { get; set; }

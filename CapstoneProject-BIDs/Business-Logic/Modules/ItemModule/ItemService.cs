@@ -1,6 +1,6 @@
 ﻿using Business_Logic.Modules.ItemModule.Interface;
 using Business_Logic.Modules.ItemModule.Request;
-using Business_Logic.Modules.ItemTypeModule.Interface;
+using Business_Logic.Modules.CategoryModule.Interface;
 using Data_Access.Constant;
 using Data_Access.Entities;
 using FluentValidation.Results;
@@ -10,16 +10,16 @@ namespace Business_Logic.Modules.ItemModule
     public class ItemService : IItemService
     {
         private readonly IItemRepository _ItemRepository;
-        private readonly IItemTypeService _ItemTypeService;
-        public ItemService(IItemRepository ItemRepository, IItemTypeService ItemTypeService)
+        private readonly ICategoryService _CategoryService;
+        public ItemService(IItemRepository ItemRepository, ICategoryService CategoryService)
         {
             _ItemRepository = ItemRepository;
-            _ItemTypeService = ItemTypeService;
+            _CategoryService = CategoryService;
         }
 
         public async Task<ICollection<Item>> GetAll()
         {
-            return await _ItemRepository.GetAll(options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+            return await _ItemRepository.GetAll(includeProperties: "User,Category",options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
         public Task<ICollection<Item>> GetItemsIsValid()
@@ -33,7 +33,7 @@ namespace Business_Logic.Modules.ItemModule
             {
                 throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
             }
-            var Item = await _ItemRepository.GetFirstOrDefaultAsync(x => x.ItemId == id);
+            var Item = await _ItemRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (Item == null)
             {
                 throw new Exception(ErrorMessage.ItemError.ITEM_NOT_FOUND);
@@ -47,7 +47,7 @@ namespace Business_Logic.Modules.ItemModule
             {
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
-            var Item = await _ItemRepository.GetFirstOrDefaultAsync(x => x.ItemName == ItemName);
+            var Item = await _ItemRepository.GetFirstOrDefaultAsync(x => x.Name == ItemName);
             if (Item == null)
             {
                 throw new Exception(ErrorMessage.ItemError.ITEM_NOT_FOUND);
@@ -75,8 +75,8 @@ namespace Business_Logic.Modules.ItemModule
             {
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
-            ItemType TypeCheck = await _ItemTypeService.GetItemTypeByName(TypeName);
-            var Item = await _ItemRepository.GetItemsBy(x => x.ItemTypeId == TypeCheck.ItemTypeId);
+            Category TypeCheck = await _CategoryService.GetCategoryByName(TypeName);
+            var Item = await _ItemRepository.GetItemsBy(x => x.CategoryId == TypeCheck.Id);
             if (Item == null)
             {
                 throw new Exception(ErrorMessage.ItemError.ITEM_NOT_FOUND);
@@ -96,23 +96,16 @@ namespace Business_Logic.Modules.ItemModule
 
             var newItem = new Item();
 
-            newItem.ItemId = new Guid();
-            newItem.ItemName = ItemRequest.ItemName;
-            newItem.Description = ItemRequest.Description;
+            newItem.Id = new Guid();
+            newItem.Name = ItemRequest.ItemName;
+            newItem.DescriptionDetail = ItemRequest.Description;
             newItem.UserId = ItemRequest.UserId;
             newItem.Quantity = ItemRequest.Quantity;
             newItem.FristPrice = ItemRequest.FristPrice;
             newItem.StepPrice = ItemRequest.StepPrice;
             newItem.Image = ItemRequest.Image;
-            newItem.ItemTypeId = ItemRequest.ItemTypeId;
-            if(ItemRequest.FristPrice < 30000000 && ItemRequest.FristPrice >= 15000000)
-            {
-                newItem.Deposit = 15;
-            }
-            if(ItemRequest.FristPrice >= 30000000)
-            {
-                newItem.Deposit = 25;
-            }
+            newItem.CategoryId = ItemRequest.CategoryId;
+            newItem.Deposit = ItemRequest.Deposit;
             newItem.UpdateDate = DateTime.Now;
             newItem.CreateDate = DateTime.Now;
             newItem.Status = false;
@@ -138,27 +131,20 @@ namespace Business_Logic.Modules.ItemModule
                     throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
                 }
 
-                Item ItemCheck = _ItemRepository.GetFirstOrDefaultAsync(x => x.ItemName == ItemRequest.ItemName).Result;
+                Item ItemCheck = _ItemRepository.GetFirstOrDefaultAsync(x => x.Name == ItemRequest.ItemName).Result;
 
                 if (ItemCheck != null)
                 {
                     throw new Exception(ErrorMessage.ItemError.ITEM_EXISTED);
                 }
-                ItemUpdate.ItemId = ItemRequest.ItemId;
-                ItemUpdate.ItemName = ItemRequest.ItemName;
-                ItemUpdate.Description = ItemRequest.Description;
+                ItemUpdate.Id = ItemRequest.ItemId;
+                ItemUpdate.Name = ItemRequest.ItemName;
+                ItemUpdate.DescriptionDetail = ItemRequest.Description;
                 ItemUpdate.Quantity = ItemRequest.Quantity;
                 ItemUpdate.FristPrice = ItemRequest.FristPrice;
                 ItemUpdate.StepPrice = ItemRequest.StepPrice;
                 ItemUpdate.Image = ItemRequest.Image;
-                if (ItemRequest.FristPrice < 30000000 && ItemRequest.FristPrice >= 15000000)
-                {
-                    ItemUpdate.Deposit = 15;
-                }
-                if (ItemRequest.FristPrice >= 30000000)
-                {
-                    ItemUpdate.Deposit = 25;
-                }
+                ItemUpdate.Deposit = ItemRequest.Deposit;
                 ItemUpdate.UpdateDate = DateTime.Now;
 
                 await _ItemRepository.UpdateAsync(ItemUpdate);
@@ -181,7 +167,7 @@ namespace Business_Logic.Modules.ItemModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                Item ItemDelete = _ItemRepository.GetFirstOrDefaultAsync(x => x.ItemId == ItemDeleteID && x.Status == true).Result;
+                Item ItemDelete = _ItemRepository.GetFirstOrDefaultAsync(x => x.Id == ItemDeleteID && x.Status == true).Result;
 
                 if (ItemDelete == null)
                 {

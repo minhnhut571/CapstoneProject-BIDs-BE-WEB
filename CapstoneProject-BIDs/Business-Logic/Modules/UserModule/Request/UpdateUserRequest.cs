@@ -17,6 +17,7 @@ namespace Business_Logic.Modules.UserModule.Request
         public string Address { get; set; }
 
         public string Phone { get; set; }
+        public string Avatar { get; set; }
 
         //public DateTime DateOfBirth { get; set; }
 
@@ -45,6 +46,7 @@ namespace Business_Logic.Modules.UserModule.Request
             RuleFor(x => x.Password).NotEmpty().NotNull();
             RuleFor(x => x.Address).NotEmpty().NotNull();
             RuleFor(x => x.Phone).NotEmpty().NotNull();
+            RuleFor(x => x.Avatar).NotEmpty().NotNull();
             //RuleFor(x => x.DateOfBirth).NotEmpty().NotNull();
             //RuleFor(x => x.Cccdnumber).NotEmpty().NotNull();
             //RuleFor(x => x.CccdfrontImage).NotEmpty().NotNull();

@@ -22,7 +22,7 @@ namespace Business_Logic.Modules.BanHistoryModule
 
         public async Task<ICollection<BanHistory>> GetAll()
         {
-            return await _BanHistoryRepository.GetAll(options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+            return await _BanHistoryRepository.GetAll(includeProperties: "User" ,options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
         public Task<ICollection<BanHistory>> GetBanHistorysIsValid()
@@ -36,7 +36,7 @@ namespace Business_Logic.Modules.BanHistoryModule
             {
                 throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
             }
-            var BanHistory = await _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.BanId == id);
+            var BanHistory = await _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (BanHistory == null)
             {
                 throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
@@ -65,7 +65,7 @@ namespace Business_Logic.Modules.BanHistoryModule
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
             User user = await _UserService.GetUserByName(userName);
-            var BanHistory = await _BanHistoryRepository.GetBanHistorysBy(x => x.UserId == user.UserId);
+            var BanHistory = await _BanHistoryRepository.GetBanHistorysBy(x => x.UserId == user.Id);
             if (BanHistory == null)
             {
                 throw new Exception(ErrorMessage.UserError.USER_NOT_FOUND);
@@ -84,7 +84,7 @@ namespace Business_Logic.Modules.BanHistoryModule
 
             var newBanHistory = new BanHistory();
 
-            newBanHistory.BanId = Guid.NewGuid();
+            newBanHistory.Id = Guid.NewGuid();
             newBanHistory.UserId = BanHistoryRequest.UserId;
             newBanHistory.Reason = BanHistoryRequest.Reason;
             newBanHistory.CreateDate = DateTime.Now;
@@ -92,7 +92,7 @@ namespace Business_Logic.Modules.BanHistoryModule
             newBanHistory.Status = true;
 
             await _BanHistoryRepository.AddAsync(newBanHistory);
-            await _StaffService.BanUser(newBanHistory.BanId);
+            await _StaffService.BanUser(newBanHistory.Id);
             return newBanHistory;
         }
 
@@ -100,7 +100,7 @@ namespace Business_Logic.Modules.BanHistoryModule
         {
             try
             {
-                var BanHistoryUpdate = _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.BanId == BanHistoryRequest.BanHistoryId).Result;
+                var BanHistoryUpdate = _BanHistoryRepository.GetFirstOrDefaultAsync(x => x.Id == BanHistoryRequest.BanHistoryId).Result;
 
                 if (BanHistoryUpdate == null)
                 {

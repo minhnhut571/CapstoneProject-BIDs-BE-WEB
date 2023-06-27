@@ -24,7 +24,7 @@ namespace Business_Logic.Modules.StaffModule
 
         public async Task<ICollection<Staff>> GetAll()
         {
-            return await _StaffRepository.GetAll(includeProperties: "Role", options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+            return await _StaffRepository.GetAll(options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
         public Task<ICollection<Staff>> GetStaffsIsValid()
@@ -38,7 +38,7 @@ namespace Business_Logic.Modules.StaffModule
             {
                 throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
             }
-            var Staff = await _StaffRepository.GetFirstOrDefaultAsync(x => x.StaffId == id);
+            var Staff = await _StaffRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (Staff == null)
             {
                 throw new Exception(ErrorMessage.StaffError.STAFF_NOT_FOUND);
@@ -52,7 +52,7 @@ namespace Business_Logic.Modules.StaffModule
             {
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
-            var Staff = await _StaffRepository.GetFirstOrDefaultAsync(x => x.StaffName == StaffName);
+            var Staff = await _StaffRepository.GetFirstOrDefaultAsync(x => x.Name == StaffName);
             if (Staff == null)
             {
                 throw new Exception(ErrorMessage.StaffError.STAFF_NOT_FOUND);
@@ -60,13 +60,13 @@ namespace Business_Logic.Modules.StaffModule
             return Staff;
         }
 
-        public async Task<Staff> GetStaffByAccountName(string accountName)
+        public async Task<Staff> GetStaffByEmail(string email)
         {
-            if (accountName == null)
+            if (email == null)
             {
                 throw new Exception(ErrorMessage.CommonError.NAME_IS_NULL);
             }
-            var Staff = await _StaffRepository.GetFirstOrDefaultAsync(x => x.AccountName == accountName);
+            var Staff = await _StaffRepository.GetFirstOrDefaultAsync(x => x.Email == email);
             if (Staff == null)
             {
                 throw new Exception(ErrorMessage.StaffError.STAFF_NOT_FOUND);
@@ -83,11 +83,6 @@ namespace Business_Logic.Modules.StaffModule
                 throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
             }
 
-            Staff staffCheckAccountName = _StaffRepository.GetFirstOrDefaultAsync(x => x.AccountName == StaffRequest.AccountName).Result;
-            if (staffCheckAccountName != null)
-            {
-                throw new Exception(ErrorMessage.CommonError.ACCOUNT_NAME_IS_EXITED);
-            }
             Staff staffCheckEmail = _StaffRepository.GetFirstOrDefaultAsync(x => x.Email == StaffRequest.Email).Result;
             if (staffCheckEmail != null)
             {
@@ -115,10 +110,8 @@ namespace Business_Logic.Modules.StaffModule
 
             var newStaff = new Staff();
 
-            newStaff.StaffId = Guid.NewGuid();
-            newStaff.RoleId = StaffRequest.RoleId;
-            newStaff.AccountName = StaffRequest.AccountName;
-            newStaff.StaffName = StaffRequest.StaffName;
+            newStaff.Id = Guid.NewGuid();
+            newStaff.Name = StaffRequest.AccountName;
             newStaff.Email = StaffRequest.Email;
             newStaff.Password = StaffRequest.Password;
             newStaff.Address = StaffRequest.Address;
@@ -126,7 +119,6 @@ namespace Business_Logic.Modules.StaffModule
             newStaff.DateOfBirth = StaffRequest.DateOfBirth;
             newStaff.CreateDate = DateTime.Now;
             newStaff.UpdateDate = DateTime.Now;
-            newStaff.Notification = "Khởi tạo thành công";         
             newStaff.Status = true;
 
             await _StaffRepository.AddAsync(newStaff);
@@ -176,7 +168,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.WRONG_PHONE_FORMAT);
                 }
 
-                StaffUpdate.StaffName = StaffRequest.StaffName;
+                StaffUpdate.Name = StaffRequest.StaffName;
                 StaffUpdate.Password = StaffRequest.Password;
                 StaffUpdate.Email = StaffRequest.Email;
                 StaffUpdate.Address = StaffRequest.Address;
@@ -203,7 +195,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                Staff StaffDelete = _StaffRepository.GetFirstOrDefaultAsync(x => x.StaffId == StaffDeleteID && x.Status == true).Result;
+                Staff StaffDelete = _StaffRepository.GetFirstOrDefaultAsync(x => x.Id == StaffDeleteID && x.Status == true).Result;
 
                 if (StaffDelete == null)
                 {
@@ -230,7 +222,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                User UserCreate = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == accountCreateID && x.Status == 0).Result;
+                User UserCreate = _UserRepository.GetFirstOrDefaultAsync(x => x.Id == accountCreateID && x.Status == 0).Result;
 
                 if (UserCreate == null)
                 {
@@ -242,10 +234,9 @@ namespace Business_Logic.Modules.StaffModule
 
                 string sendto = UserCreate.Email;
                 string subject = "[BIDs] - Dịch vụ tài khoản";
-                string content = "Tài khoản" + UserCreate.AccountName + " đã được khởi tạo thành công, chúc bạn có những phút giây sử dụng hệ thống vui vẻ";
+                string content = "Tài khoản" + UserCreate.Name + " đã được khởi tạo thành công, chúc bạn có những phút giây sử dụng hệ thống vui vẻ";
 
                 UserCreate.Status = (int)UserStatusEnum.Acctive;
-                UserCreate.Notification = "Khởi tạo thành công, chào mừng đến với BIDs";
                 await _UserRepository.UpdateAsync(UserCreate);
 
                 MailMessage mail = new MailMessage();
@@ -284,7 +275,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                User UserCreate = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == accountCreateID && x.Status == 0).Result;
+                User UserCreate = _UserRepository.GetFirstOrDefaultAsync(x => x.Id == accountCreateID && x.Status == 0).Result;
 
                 if (UserCreate == null)
                 {
@@ -296,10 +287,9 @@ namespace Business_Logic.Modules.StaffModule
 
                 string sendto = UserCreate.Email;
                 string subject = "[BIDs] - Dịch vụ tài khoản";
-                string content = "Tài khoản" + UserCreate.AccountName + " khởi tạo không thành công vì thông tin bạn cung cấp không chính xác!";
+                string content = "Tài khoản" + UserCreate.Name + " khởi tạo không thành công vì thông tin bạn cung cấp không chính xác!";
 
                 UserCreate.Status = (int)UserStatusEnum.Deny;
-                UserCreate.Notification = "Khởi tạo thất bại, thông tin không hợp lệ";
                 await _UserRepository.UpdateAsync(UserCreate);
 
                 MailMessage mail = new MailMessage();
@@ -337,7 +327,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                var UserBan = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == UserBanID && x.Status == 0).Result;
+                var UserBan = _UserRepository.GetFirstOrDefaultAsync(x => x.Id == UserBanID && x.Status == 0).Result;
 
                 if (UserBan == null)
                 {
@@ -349,7 +339,7 @@ namespace Business_Logic.Modules.StaffModule
 
                 string sendto = UserBan.Email;
                 string subject = "[BIDs] - Dịch vụ tài khoản";
-                string content = "Tài khoản" + UserBan.AccountName + "đã bị khóa, bạn sẽ không thể sử dụng dịch vụ của hệ thống chúng tôi! ";
+                string content = "Tài khoản" + UserBan.Name + "đã bị khóa, bạn sẽ không thể sử dụng dịch vụ của hệ thống chúng tôi! ";
 
                 UserBan.Status = (int)UserStatusEnum.Ban;
                 await _UserRepository.UpdateAsync(UserBan);
@@ -389,7 +379,7 @@ namespace Business_Logic.Modules.StaffModule
                     throw new Exception(ErrorMessage.CommonError.ID_IS_NULL);
                 }
 
-                User UserUnban = _UserRepository.GetFirstOrDefaultAsync(x => x.UserId == UserUnbanID && x.Status == 0).Result;
+                User UserUnban = _UserRepository.GetFirstOrDefaultAsync(x => x.Id == UserUnbanID && x.Status == 0).Result;
 
                 if (UserUnban == null)
                 {
@@ -401,7 +391,7 @@ namespace Business_Logic.Modules.StaffModule
 
                 string sendto = UserUnban.Email;
                 string subject = "[BIDs] - Dịch vụ tài khoản";
-                string content = "Tài khoản" + UserUnban.AccountName + "đã được mở khóa, mong bạn sẽ có những trải nghiệm tốt tại hệ thống. ";
+                string content = "Tài khoản" + UserUnban.Name + "đã được mở khóa, mong bạn sẽ có những trải nghiệm tốt tại hệ thống. ";
 
                 UserUnban.Status = (int)UserStatusEnum.Acctive;
                 await _UserRepository.UpdateAsync(UserUnban);

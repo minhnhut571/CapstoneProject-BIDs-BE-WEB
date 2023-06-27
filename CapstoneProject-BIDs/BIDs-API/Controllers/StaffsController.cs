@@ -88,18 +88,18 @@ namespace BIDs_API.Controllers
             return Staff;
         }
 
-        [HttpGet("by_account_name/{name}")]
-        public async Task<ActionResult<StaffResponseAdmin>> GetStaffByAccountName([FromRoute] string name)
-        {
-            var Staff = _mapper.Map<StaffResponseAdmin>(await _StaffService.GetStaffByAccountName(name));
+        //[HttpGet("by_account_name/{name}")]
+        //public async Task<ActionResult<StaffResponseAdmin>> GetStaffByAccountName([FromRoute] string name)
+        //{
+        //    var Staff = _mapper.Map<StaffResponseAdmin>(await _StaffService.GetStaffByAccountName(name));
 
-            if (Staff == null)
-            {
-                return NotFound();
-            }
+        //    if (Staff == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Staff;
-        }
+        //    return Staff;
+        //}
 
         // PUT api/<ValuesController>/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

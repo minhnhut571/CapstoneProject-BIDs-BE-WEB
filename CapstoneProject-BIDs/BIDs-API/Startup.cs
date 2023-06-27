@@ -1,15 +1,21 @@
-﻿using Business_Logic.Modules.BanHistoryModule;
+﻿using BIDs_API.Mapper;
+using BIDs_API.SignalR;
+using Business_Logic.Modules.AdminModule;
+using Business_Logic.Modules.AdminModule.Interface;
+using Business_Logic.Modules.BanHistoryModule;
 using Business_Logic.Modules.BanHistoryModule.Interface;
+using Business_Logic.Modules.CategoryModule;
+using Business_Logic.Modules.CategoryModule.Interface;
+using Business_Logic.Modules.DescriptionModule;
+using Business_Logic.Modules.DescriptionModule.Interface;
+using Business_Logic.Modules.FeeModule;
+using Business_Logic.Modules.FeeModule.Interface;
 using Business_Logic.Modules.ItemModule;
 using Business_Logic.Modules.ItemModule.Interface;
-using Business_Logic.Modules.ItemTypeModule;
-using Business_Logic.Modules.ItemTypeModule.Interface;
 using Business_Logic.Modules.LoginModule;
 using Business_Logic.Modules.LoginModule.InterFace;
-using Business_Logic.Modules.PaymentModule;
-using Business_Logic.Modules.PaymentModule.Interface;
-using Business_Logic.Modules.RoleModule;
-using Business_Logic.Modules.RoleModule.Interface;
+using Business_Logic.Modules.SessionDetailModule;
+using Business_Logic.Modules.SessionDetailModule.Interface;
 using Business_Logic.Modules.SessionModule;
 using Business_Logic.Modules.SessionModule.Interface;
 using Business_Logic.Modules.StaffModule;
@@ -22,12 +28,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using BIDs_API.Mapper;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.SignalR;
-using BIDs_API.SignalR;
-using Business_Logic.Modules.SessionDetailModule.Interface;
-using Business_Logic.Modules.SessionDetailModule;
 
 namespace BIDs_API
 {
@@ -93,31 +93,34 @@ namespace BIDs_API
                     };
                 });
          
-            //User Module
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IUserService, UserService>();
+            //Admin Module
+            services.AddScoped<IAdminRepository, AdminRepository>();
+            services.AddScoped<IAdminService, AdminService>();
             //Staff Module
             services.AddScoped<IStaffRepository, StaffRepository>();
             services.AddScoped<IStaffService, StaffService>();
-            //Role Module
-            services.AddScoped<IRoleRepository, RoleRepository>();
-            services.AddScoped<IRoleService, RoleService>();
-            //Role Module
+            //User Module
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>();
+            //Fee Module
+            services.AddScoped<IFeeRepository, FeeRepository>();
+            services.AddScoped<IFeeService, FeeService>();
+            //Ban History Module
             services.AddScoped<IBanHistoryRepository, BanHistoryRepository>();
             services.AddScoped<IBanHistoryService, BanHistoryService>();
-            //Role Module
-            services.AddScoped<IItemTypeRepository, ItemTypeRepository>();
-            services.AddScoped<IItemTypeService, ItemTypeService>();
-            //Role Module
+            //Category Module
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            //Session Module
             services.AddScoped<ISessionRepository, SessionRepository>();
             services.AddScoped<ISessionService, SessionService>();
-            //Role Module
+            //Item Module
             services.AddScoped<IItemRepository, ItemRepository>();
             services.AddScoped<IItemService, ItemService>();
-            //Role Module
-            services.AddScoped<IPaymentRepository, PaymentRepository>();
-            services.AddScoped<IPaymentService, PaymentService>();
-            //Role Module
+            //Description Module
+            services.AddScoped<IDescriptionRepository, DescriptionRepository>();
+            services.AddScoped<IDescriptionService, DescriptionService>();
+            //Session Detail Module
             services.AddScoped<ISessionDetailRepository, SessionDetailRepository>();
             services.AddScoped<ISessionDetailService, SessionDetailService>();
             //Login Module
@@ -151,12 +154,14 @@ namespace BIDs_API
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<UserHub>("/userhub");
+                endpoints.MapHub<AdminHub>("/adminhub");
                 endpoints.MapHub<StaffHub>("/staffhub");
                 endpoints.MapHub<SessionHub>("/sessionhub");
+                endpoints.MapHub<FeeHub>("/feehub");
                 endpoints.MapHub<SessionDetailHub>("/sessiondetailhub");
-                endpoints.MapHub<RoleHub>("/rolehub");
+                endpoints.MapHub<DescriptionHub>("/descriptionhub");
                 endpoints.MapHub<ItemHub>("/itemhub");
-                endpoints.MapHub<ItemTypeHub>("/itemtypehub");
+                endpoints.MapHub<CategoryHub>("/categoryhub");
                 endpoints.MapHub<BanHistoryHub>("/banhistoryhub");
             });
         }
