@@ -17,6 +17,8 @@ using System.Security.Cryptography;
 using Business_Logic.Modules.LoginModule.Data;
 using Microsoft.Extensions.Configuration;
 using Business_Logic.Modules.AdminModule.Interface;
+using Business_Logic.Modules.UserModule.Request;
+using Data_Access.Enum;
 
 namespace Business_Logic.Modules.LoginModule
 {
@@ -36,7 +38,7 @@ namespace Business_Logic.Modules.LoginModule
             _configuration = configuration;
             _AdminRepository = adminRepository;
         }
-        public User LoginUser(LoginRequest loginRequest)
+        public ReturnAccountLogin Login(LoginRequest loginRequest)
         {
             ValidationResult result = new LoginRequestValidator().Validate(loginRequest);
             if (!result.IsValid)
@@ -46,37 +48,38 @@ namespace Business_Logic.Modules.LoginModule
 
             var UserCheckLogin =  _UserRepository.GetFirstOrDefaultAsync(x => x.Email == loginRequest.Email
             && x.Password == loginRequest.Password).Result;
-
-            if (UserCheckLogin == null )
-            {
-                throw new Exception(ErrorMessage.LoginError.WRONG_ACCOUNT_NAME_OR_PASSWORD);
-            }
-            return UserCheckLogin;
-        }
-
-        public string LoginStaff(LoginRequest loginRequest)
-        {
-            ValidationResult result = new LoginRequestValidator().Validate(loginRequest);
-            if (!result.IsValid)
-            {
-                throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
-            }
-
             var StaffCheckLogin = _StaffRepository.GetFirstOrDefaultAsync(x => x.Email == loginRequest.Email
             && x.Password == loginRequest.Password).Result;
             var AdminCheckLogin = _AdminRepository.GetFirstOrDefaultAsync(x => x.Email == loginRequest.Email
             && x.Password == loginRequest.Password).Result;
+            ReturnAccountLogin accountLogin = new ReturnAccountLogin();
             if (StaffCheckLogin != null)
             {
-                return "Staff";
+                accountLogin.Email = loginRequest.Email;
+                accountLogin.Role = "Staff";
+                return accountLogin;
             }
             if (AdminCheckLogin != null)
             {
-                return "Admin";
+                accountLogin.Email = loginRequest.Email;
+                accountLogin.Role = "Admin";
+                return accountLogin;
+            }
+            if (UserCheckLogin != null)
+            {
+                accountLogin.Email = loginRequest.Email;
+                if(UserCheckLogin.Role == (int)RoleEnum.Auctioneer)
+                {
+                    accountLogin.Role = "Auctioneer";
+                }
+                else
+                {
+                    accountLogin.Role = "Bidder";
+                }
+                return accountLogin;
             }
             throw new Exception(ErrorMessage.LoginError.WRONG_ACCOUNT_NAME_OR_PASSWORD);
         }
-
         public ClaimsPrincipal EncrypToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -201,60 +204,96 @@ namespace Business_Logic.Modules.LoginModule
             SmtpServer.Send(mail);
         }
 
-        //public async Task<TokenModel> GenerateToken(LoginRespone account)
-        //{
-        //    var jwtToken = new JwtSecurityTokenHandler();
-        //    var secretKeyByte = Encoding.UTF8.GetBytes(_appsetting.SecretKey);
-        //    //token for user
-        //    var tokenDescription = new SecurityTokenDescriptor
-        //    {
-        //        Subject = new ClaimsIdentity(new[]
-        //         {
-        //            new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+        public async Task<User> CreateAccount(CreateUserRequest userRequest)
+        {
 
-        //            new Claim("AccountID", string.Join(",", account.AccountID)),
-        //        }),
-        //        Expires = DateTime.UtcNow.AddHours(2),
-        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeyByte),
-        //            SecurityAlgorithms.HmacSha512Signature)
-        //    };
+            ValidationResult result = new CreateUserRequestValidator().Validate(userRequest);
+            if (!result.IsValid)
+            {
+                throw new Exception(ErrorMessage.CommonError.INVALID_REQUEST);
+            }
 
+            User userCheckEmail = _UserRepository.GetFirstOrDefaultAsync(x => x.Email == userRequest.Email).Result;
+            if (userCheckEmail != null)
+            {
+                throw new Exception(ErrorMessage.CommonError.EMAIL_IS_EXITED);
+            }
+            User userCheckPhone = _UserRepository.GetFirstOrDefaultAsync(x => x.Phone == userRequest.Phone).Result;
+            if (userCheckPhone != null)
+            {
+                throw new Exception(ErrorMessage.CommonError.PHONE_IS_EXITED);
+            }
+            User userCheckCCCDNumber = _UserRepository.GetFirstOrDefaultAsync(x => x.Cccdnumber == userRequest.Cccdnumber).Result;
+            if (userCheckCCCDNumber != null)
+            {
+                throw new Exception(ErrorMessage.CommonError.CCCD_NUMBER_IS_EXITED);
+            }
 
-        //    //create Token
-        //    var token = jwtToken.CreateToken(tokenDescription);
-        //    var accessToken = jwtToken.WriteToken(token);
-        //    return new TokenModel
-        //    {
-        //        AccessToken = accessToken
-        //    };
+            if (!userRequest.Email.Contains("@"))
+            {
+                throw new Exception(ErrorMessage.CommonError.WRONG_EMAIL_FORMAT);
+            }
+            if ((!userRequest.Phone.StartsWith("09")
+                && !userRequest.Phone.StartsWith("08")
+                && !userRequest.Phone.StartsWith("07")
+                && !userRequest.Phone.StartsWith("05")
+                && !userRequest.Phone.StartsWith("03"))
+                || userRequest.Phone.Length != 10)
+            {
+                throw new Exception(ErrorMessage.CommonError.WRONG_PHONE_FORMAT);
+            }
+            if (userRequest.Cccdnumber.Length != 12
+                || !userRequest.Cccdnumber.StartsWith("0"))
+            {
+                throw new Exception(ErrorMessage.CommonError.WRONG_CCCD_NUMBER_FORMAT);
+            }
 
-        //}
-        //private string GenerateRefeshToken()
-        //{
-        //    var random = new Byte[32];
-        //    using (var rng = RandomNumberGenerator.Create())
-        //    {
-        //        rng.GetBytes(random);
-        //        string token = Convert.ToBase64String(random);
-        //        return token;
-        //    }
-        //}
-        ////giải mã token
-        //public ClaimsPrincipal EncrypToken(string token)
-        //{
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    //Decode JWT
-        //    var claims = tokenHandler.ValidateToken(token, new TokenValidationParameters
-        //    {
-        //        ValidateIssuerSigningKey = true,
-        //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appsetting.SecretKey)),
-        //        ValidateIssuer = false,
-        //        ValidateAudience = false,
-        //        ClockSkew = TimeSpan.Zero
-        //    }, out SecurityToken validatedToken);
-        //    //Access the claim 
-        //    return claims;
-        //}
+            var newUser = new User();
 
+            newUser.Id = Guid.NewGuid();
+            newUser.Name = userRequest.UserName;
+            newUser.Avatar = userRequest.UserName;
+            newUser.Role = (int)RoleEnum.Bidder;
+            newUser.Email = userRequest.Email;
+            newUser.Password = userRequest.Password;
+            newUser.Address = userRequest.Address;
+            newUser.Phone = userRequest.Phone;
+            newUser.DateOfBirth = userRequest.DateOfBirth;
+            newUser.Cccdnumber = userRequest.Cccdnumber;
+            newUser.CccdfrontImage = userRequest.CccdfrontImage;
+            newUser.CccdbackImage = userRequest.CccdbackImage;
+            newUser.CreateDate = DateTime.Now;
+            newUser.UpdateDate = DateTime.Now;
+            newUser.Status = (int)UserStatusEnum.Waitting;
+
+            await _UserRepository.AddAsync(newUser);
+
+            string _gmail = "bidauctionfloor@gmail.com";
+            string _password = "gnauvhbfubtgxjow";
+
+            string sendto = userRequest.Email;
+            string subject = "BIDs - Tạo Tài Khoản";
+
+            string content = "Tài khoản " + userRequest.Email + " đã được tạo thành công và đang đợi xét duyệt từ nhân viên hệ thống";
+
+            MailMessage mail = new MailMessage();
+            SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+
+            mail.From = new MailAddress(_gmail);
+            mail.To.Add(userRequest.Email);
+            mail.Subject = subject;
+            mail.IsBodyHtml = true;
+            mail.Body = content;
+
+            mail.Priority = MailPriority.High;
+
+            SmtpServer.Port = 587;
+            SmtpServer.UseDefaultCredentials = false;
+            SmtpServer.Credentials = new NetworkCredential(_gmail, _password);
+            SmtpServer.EnableSsl = true;
+
+            SmtpServer.Send(mail);
+            return newUser;
+        }
     }
 }

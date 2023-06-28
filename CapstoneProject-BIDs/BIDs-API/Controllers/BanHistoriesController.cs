@@ -4,6 +4,7 @@ using Business_Logic.Modules.BanHistoryModule.Interface;
 using Business_Logic.Modules.BanHistoryModule.Request;
 using Business_Logic.Modules.BanHistoryModule.Response;
 using Data_Access.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -11,6 +12,7 @@ namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Staff")]
     public class BanHistoriesController : ControllerBase
     {
         private readonly IBanHistoryService _BanHistoryService;

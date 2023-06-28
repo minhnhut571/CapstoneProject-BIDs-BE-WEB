@@ -24,9 +24,12 @@ using Business_Logic.Modules.UserModule;
 using Business_Logic.Modules.UserModule.Interface;
 using Data_Access.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 using System.Text;
 
 namespace BIDs_API
@@ -69,6 +72,29 @@ namespace BIDs_API
                     Type = SecuritySchemeType.Http,
                     Scheme = "Bearer"
                 });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+     {
+                    {
+                      new OpenApiSecurityScheme
+                      {
+                        Reference = new OpenApiReference
+                          {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                          },
+                          Scheme = "oauth2",
+                          Name = "Bearer",
+                          In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    }
+    });
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                c.IgnoreObsoleteActions();
+                c.IgnoreObsoleteProperties();
+                c.CustomSchemaIds(type => type.FullName);
+                c.OperationFilter<AuthorizeCheckOperationFilter>();
             });
             services.AddDbContext<BIDsContext>(
                 opt => opt.UseSqlServer(
@@ -129,6 +155,8 @@ namespace BIDs_API
             services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
+            services.AddHttpContextAccessor();
+            services.AddEndpointsApiExplorer();
             services.AddAutoMapper(typeof(Mapping));
         }
 
@@ -142,11 +170,15 @@ namespace BIDs_API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BIDs v1"));
             }
 
-            app.UseHttpsRedirection();
+            app.UseSwagger();
 
-            app.UseRouting();
+            app.UseSwaggerUI();
+
+            app.UseHttpsRedirection();           
 
             app.UseAuthentication();
+
+            app.UseRouting();
 
             app.UseAuthorization();
 
@@ -164,6 +196,22 @@ namespace BIDs_API
                 endpoints.MapHub<CategoryHub>("/categoryhub");
                 endpoints.MapHub<BanHistoryHub>("/banhistoryhub");
             });
+        }
+
+        public class AuthorizeCheckOperationFilter : IOperationFilter
+        {
+            public void Apply(OpenApiOperation operation, OperationFilterContext context)
+            {
+                var authAttributes = context.MethodInfo.GetCustomAttributes<AuthorizeAttribute>();
+                if (authAttributes.Any())
+                {
+                    var authHeaderParameter = operation.Parameters.SingleOrDefault(p => p.In == ParameterLocation.Header && p.Name == "Authorization");
+                    if (authHeaderParameter != null)
+                    {
+                        authHeaderParameter.Description = authHeaderParameter.Description.Replace("Bearer ", "");
+                    }
+                }
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using AutoMapper;
 using Business_Logic.Modules.UserModule.Response;
 using Microsoft.AspNetCore.SignalR;
 using BIDs_API.SignalR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BIDs_API.Controllers
 {

@@ -4,6 +4,7 @@ using Business_Logic.Modules.ItemModule.Interface;
 using Business_Logic.Modules.ItemModule.Request;
 using Business_Logic.Modules.ItemModule.Response;
 using Data_Access.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -11,6 +12,7 @@ namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ItemsController : ControllerBase
     {
         private readonly IItemService _ItemService;

@@ -4,6 +4,7 @@ using Business_Logic.Modules.CategoryModule.Interface;
 using Business_Logic.Modules.CategoryModule.Request;
 using Business_Logic.Modules.CategoryModule.Response;
 using Data_Access.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -11,6 +12,7 @@ namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class CategorysController : ControllerBase
     {
         private readonly ICategoryService _CategoryService;

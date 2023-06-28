@@ -145,6 +145,33 @@ namespace Business_Logic.Modules.UserModule
             newUser.Status = (int)UserStatusEnum.Waitting;
 
             await _UserRepository.AddAsync(newUser);
+
+            string _gmail = "bidauctionfloor@gmail.com";
+            string _password = "gnauvhbfubtgxjow";
+
+            string sendto = userRequest.Email;
+            string subject = "BIDs - Tạo Tài Khoản";
+
+            string content = "Tài khoản " + userRequest.Email + " đã được tạo thành công và đang đợi xét duyệt từ nhân viên hệ thống";
+
+            MailMessage mail = new MailMessage();
+            SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+
+            mail.From = new MailAddress(_gmail);
+            mail.To.Add(userRequest.Email);
+            mail.Subject = subject;
+            mail.IsBodyHtml = true;
+            mail.Body = content;
+
+            mail.Priority = MailPriority.High;
+
+            SmtpServer.Port = 587;
+            SmtpServer.UseDefaultCredentials = false;
+            SmtpServer.Credentials = new NetworkCredential(_gmail, _password);
+            SmtpServer.EnableSsl = true;
+
+            SmtpServer.Send(mail);
+
             return newUser;
         }
 

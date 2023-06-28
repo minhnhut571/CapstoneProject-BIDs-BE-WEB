@@ -12,11 +12,13 @@ using BIDs_API.SignalR;
 using Microsoft.AspNetCore.SignalR;
 using Business_Logic.Modules.SessionModule.Response;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SessionsController : ControllerBase
     {
         private readonly ISessionService _SessionService;
