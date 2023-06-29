@@ -155,8 +155,8 @@ namespace Data_Access.Entities
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
                 entity.HasOne(d => d.Item)
-                    .WithMany(p => p.BookingItems)
-                    .HasForeignKey(d => d.ItemId)
+                    .WithOne(p => p.BookingItems)
+                    .HasForeignKey<BookingItem>(d => d.ItemId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__BookingIt__ItemI__3B75D760");
 
@@ -457,6 +457,8 @@ namespace Data_Access.Entities
 
                 entity.Property(e => e.FeeId).HasColumnName("FeeID");
 
+                entity.Property(e => e.ItemId).HasColumnName("ItemID");
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
@@ -468,6 +470,11 @@ namespace Data_Access.Entities
                     .HasForeignKey(d => d.FeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Session__FeeID__4222D4EF");
+                entity.HasOne(d => d.Item)
+                    .WithOne(p => p.Sessions)
+                    .HasForeignKey<Session>(d => d.ItemId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Session__Item");
             });
 
             modelBuilder.Entity<SessionDetail>(entity =>

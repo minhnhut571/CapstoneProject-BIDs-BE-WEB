@@ -9,7 +9,8 @@ namespace Data_Access.Entities
     {
         public Item()
         {
-            BookingItems = new HashSet<BookingItem>();
+            BookingItems = new BookingItem();
+            Sessions = new Session();
         }
 
         public Guid Id { get; set; }
@@ -28,6 +29,7 @@ namespace Data_Access.Entities
 
         public virtual Category Category { get; set; }
         public virtual User User { get; set; }
-        public virtual ICollection<BookingItem> BookingItems { get; set; }
+        public virtual BookingItem BookingItems { get; set; }
+        public virtual Session Sessions { get; set; }
     }
 }

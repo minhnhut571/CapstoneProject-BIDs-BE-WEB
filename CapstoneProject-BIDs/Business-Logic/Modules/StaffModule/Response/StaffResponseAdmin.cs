@@ -10,8 +10,6 @@ namespace Business_Logic.Modules.StaffModule.Response
     public class StaffResponseAdmin
     {
         public Guid StaffId { get; set; }
-        public string RoleName { get; set; }
-        public string AccountName { get; set; }
         public string StaffName { get; set; }
         public string Email { get; set; }
         public string Address { get; set; }

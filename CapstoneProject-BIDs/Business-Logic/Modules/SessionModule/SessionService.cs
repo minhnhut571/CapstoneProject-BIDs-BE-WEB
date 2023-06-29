@@ -23,7 +23,7 @@ namespace Business_Logic.Modules.SessionModule
 
         public async Task<ICollection<Session>> GetAll()
         {
-            return await _SessionRepository.GetAll(includeProperties: "Fee", options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
+            return await _SessionRepository.GetAll(includeProperties: "Fee,Item", options: o => o.OrderByDescending(x => x.UpdateDate).ToList());
         }
 
         public async Task<ICollection<Session>> GetSessionsIsNotStart()

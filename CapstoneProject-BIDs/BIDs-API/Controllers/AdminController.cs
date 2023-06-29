@@ -75,6 +75,20 @@ namespace BIDs_API.Controllers
             return Admin;
         }
 
+        // GET api/<ValuesController>/abc
+        [HttpGet("by_email/{email}")]
+        public async Task<ActionResult<Admin>> GetAdminByEmail([FromRoute] string email)
+        {
+            var Admin = await _AdminService.GetAdminByEmail(email);
+
+            if (Admin == null)
+            {
+                return NotFound();
+            }
+
+            return Admin;
+        }
+
         // PUT api/<ValuesController>/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]

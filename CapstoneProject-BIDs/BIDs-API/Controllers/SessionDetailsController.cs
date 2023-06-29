@@ -30,14 +30,14 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SessionDetailResponseStaff>>> GetSessionDetailsForAdmin()
+        public async Task<ActionResult<IEnumerable<SessionDetailResponseStaffAndAdmin>>> GetSessionDetailsForAdmin()
         {
             try
             {
                 var list = await _SessionDetailService.GetAll();
                 var response = list.Select
                            (
-                             emp => _mapper.Map<SessionDetail, SessionDetailResponseStaff>(emp)
+                             emp => _mapper.Map<SessionDetail, SessionDetailResponseStaffAndAdmin>(emp)
                            );
                 {
                     return NotFound();
@@ -52,9 +52,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<SessionDetailResponseStaff>> GetSessionDetailByID([FromRoute] Guid? id)
+        public async Task<ActionResult<SessionDetailResponseStaffAndAdmin>> GetSessionDetailByID([FromRoute] Guid? id)
         {
-            var SessionDetail = _mapper.Map<SessionDetailResponseStaff>(await _SessionDetailService.GetSessionDetailByID(id));
+            var SessionDetail = _mapper.Map<SessionDetailResponseStaffAndAdmin>(await _SessionDetailService.GetSessionDetailByID(id));
 
             if (SessionDetail == null)
             {
@@ -70,7 +70,7 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                var SessionDetail = _mapper.Map<SessionDetailResponse>(await _SessionDetailService.GetSessionDetailByUser(id));
+                var SessionDetail = _mapper.Map<SessionDetailResponseUser>(await _SessionDetailService.GetSessionDetailByUser(id));
                 if (SessionDetail == null)
                 {
                     return NotFound();
@@ -89,7 +89,7 @@ namespace BIDs_API.Controllers
         {
             try
             {
-                var SessionDetail = _mapper.Map<SessionDetailResponse>(await _SessionDetailService.GetSessionDetailBySession(id));
+                var SessionDetail = _mapper.Map<SessionDetailResponseUser>(await _SessionDetailService.GetSessionDetailBySession(id));
                 if (SessionDetail == null)
                 {
                     return NotFound();
@@ -122,13 +122,13 @@ namespace BIDs_API.Controllers
         // POST api/<ValuesController>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<SessionDetailResponseStaff>> PostSessionDetail([FromBody] CreateSessionDetailRequest createSessionDetailRequest)
+        public async Task<ActionResult<SessionDetailResponseStaffAndAdmin>> PostSessionDetail([FromBody] CreateSessionDetailRequest createSessionDetailRequest)
         {
             try
             {
                 var SessionDetail = await _SessionDetailService.AddNewSessionDetail(createSessionDetailRequest);
                 await _hubSessionDetailContext.Clients.All.SendAsync("ReceiveSessionDetailAdd", SessionDetail);
-                return Ok(_mapper.Map<SessionDetailResponseStaff>(SessionDetail));
+                return Ok(_mapper.Map<SessionDetailResponseStaffAndAdmin>(SessionDetail));
             }
             catch (Exception ex)
             {

@@ -8,11 +8,14 @@ using System.Threading.Tasks;
 
 namespace Business_Logic.Modules.SessionModule.Response
 {
-    public class SessionResponseStaff
+    public class SessionResponseStaffAndAdmin
     {
         public Guid SessionId { get; set; }
+        public Guid FeeId { get; set; }
         public string FeeName { get; set; }
         public string SessionName { get; set; }
+        public Guid ItemId { get; set; }
+        public string ItemName { get; set; }
         public DateTime BeginTime { get; set; }
         public DateTime AuctionTime { get; set; }
         public DateTime EndTime { get; set; }

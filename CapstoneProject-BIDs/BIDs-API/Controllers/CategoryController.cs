@@ -30,14 +30,14 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryResponseStaff>>> GetCategorysForAdmin()
+        public async Task<ActionResult<IEnumerable<CategoryResponseAdmin>>> GetCategorysForAdmin()
         {
             try
             {
                 var list = await _CategoryService.GetAll();
                 var response = list.Select
                            (
-                             emp => _mapper.Map<Category, CategoryResponseStaff>(emp)
+                             emp => _mapper.Map<Category, CategoryResponseAdmin>(emp)
                            );
                 if (response == null)
                 {
@@ -53,9 +53,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CategoryResponseStaff>> GetCategoryByID([FromRoute] Guid? id)
+        public async Task<ActionResult<CategoryResponseAdmin>> GetCategoryByID([FromRoute] Guid? id)
         {
-            var Category = _mapper.Map<CategoryResponseStaff>(await _CategoryService.GetCategoryByID(id));
+            var Category = _mapper.Map<CategoryResponseAdmin>(await _CategoryService.GetCategoryByID(id));
 
             if (Category == null)
             {
@@ -67,9 +67,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_name/{name}")]
-        public async Task<ActionResult<CategoryResponseStaff>> GetCategoryByName([FromRoute] string name)
+        public async Task<ActionResult<CategoryResponseAdmin>> GetCategoryByName([FromRoute] string name)
         {
-            var Category = _mapper.Map<CategoryResponseStaff>(await _CategoryService.GetCategoryByName(name));
+            var Category = _mapper.Map<CategoryResponseAdmin>(await _CategoryService.GetCategoryByName(name));
 
             if (Category == null)
             {
@@ -99,13 +99,13 @@ namespace BIDs_API.Controllers
         // POST api/<ValuesController>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<CategoryResponseStaff>> PostCategory([FromBody] CreateCategoryRequest createCategoryRequest)
+        public async Task<ActionResult<CategoryResponseAdmin>> PostCategory([FromBody] CreateCategoryRequest createCategoryRequest)
         {
             try
             {
                 var Category = await _CategoryService.AddNewCategory(createCategoryRequest);
                 await _hubContext.Clients.All.SendAsync("ReceiveCategoryAdd", Category);
-                return Ok(_mapper.Map<CategoryResponseStaff>(Category));
+                return Ok(_mapper.Map<CategoryResponseAdmin>(Category));
             }
             catch (Exception ex)
             {
