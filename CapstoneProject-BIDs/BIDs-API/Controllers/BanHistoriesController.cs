@@ -4,6 +4,7 @@ using Business_Logic.Modules.BanHistoryModule.Interface;
 using Business_Logic.Modules.BanHistoryModule.Request;
 using Business_Logic.Modules.BanHistoryModule.Response;
 using Data_Access.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -11,7 +12,7 @@ namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Staff")]
+    [Authorize(Roles = "Staff,Admin")]
     public class BanHistoriesController : ControllerBase
     {
         private readonly IBanHistoryService _BanHistoryService;
@@ -29,14 +30,14 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BanHistoryResponseStaff>>> GetBanHistorysForAdmin()
+        public async Task<ActionResult<IEnumerable<BanHistoryResponseUser>>> GetBanHistorysForAdmin()
         {
             try
             {
                 var list = await _BanHistoryService.GetAll();
                 var response = list.Select
                            (
-                             emp => _mapper.Map<BanHistory, BanHistoryResponseStaff>(emp)
+                             emp => _mapper.Map<BanHistory, BanHistoryResponseUser>(emp)
                            );
                 if (response == null)
                 {
@@ -52,14 +53,14 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<BanHistoryResponseStaff>>> GetBanHistoryByUserID([FromRoute] Guid? id)
+        public async Task<ActionResult<IEnumerable<BanHistoryResponseUser>>> GetBanHistoryByUserID([FromRoute] Guid? id)
         {
             try
             {
                 var list = await _BanHistoryService.GetBanHistoryByUserID(id);
                 var response = list.Select
                            (
-                             emp => _mapper.Map<BanHistory, BanHistoryResponseStaff>(emp)
+                             emp => _mapper.Map<BanHistory, BanHistoryResponseUser>(emp)
                            );
                 if (response == null)
                 {
@@ -75,14 +76,14 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_name/{name}")]
-        public async Task<ActionResult<IEnumerable<BanHistoryResponseStaff>>> GetBanHistoryByUserName([FromRoute] string name)
+        public async Task<ActionResult<IEnumerable<BanHistoryResponseUser>>> GetBanHistoryByUserName([FromRoute] string name)
         {
             try
             {
                 var list = await _BanHistoryService.GetBanHistoryByUserName(name);
                 var response = list.Select
                            (
-                             emp => _mapper.Map<BanHistory, BanHistoryResponseStaff>(emp)
+                             emp => _mapper.Map<BanHistory, BanHistoryResponseUser>(emp)
                            );
                 if (response == null)
                 {
@@ -116,13 +117,13 @@ namespace BIDs_API.Controllers
         // POST api/<ValuesController>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<BanHistoryResponseStaff>> PostBanHistory([FromBody] CreateBanHistoryRequest createBanHistoryRequest)
+        public async Task<ActionResult<BanHistoryResponseUser>> PostBanHistory([FromBody] CreateBanHistoryRequest createBanHistoryRequest)
         {
             try
             {
                 var BanHistory = await _BanHistoryService.AddNewBanHistory(createBanHistoryRequest);
                 await _hubContext.Clients.All.SendAsync("ReceiveBanHistoryAdd", BanHistory);
-                return Ok(_mapper.Map<BanHistoryResponseStaff>(BanHistory));
+                return Ok(_mapper.Map<BanHistoryResponseUser>(BanHistory));
             }
             catch (Exception ex)
             {

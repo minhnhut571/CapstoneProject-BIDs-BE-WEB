@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using Data_Access.Entities;
 using Business_Logic.Modules.DescriptionModule.Interface;
 using Business_Logic.Modules.DescriptionModule.Request;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class DescriptionController : ControllerBase
     {
         private readonly IDescriptionService _DescriptionService;

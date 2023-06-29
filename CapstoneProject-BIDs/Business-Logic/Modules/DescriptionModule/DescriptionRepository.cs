@@ -1,8 +1,7 @@
-﻿using Business_Logic.Modules.CategoryModule.Interface;
+﻿using Business_Logic.Modules.DescriptionModule.Interface;
 using Common.Utils.Repository;
 using Data_Access.Entities;
 using Microsoft.EntityFrameworkCore;
-using Polly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,25 +9,24 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business_Logic.Modules.CategoryModule
+namespace Business_Logic.Modules.DescriptionModule
 {
-    public class CategoryRepository : Repository<Category>, ICategoryRepository
+    public class DescriptionRepository : Repository<Description>, IDescriptionRepository
     {
         private readonly BIDsContext _db;
 
-        public CategoryRepository(BIDsContext db) : base(db)
+        public DescriptionRepository(BIDsContext db) : base(db)
         {
             _db = db;
         }
 
-
-        public async Task<ICollection<Category>> GetCategorysBy(
-            Expression<Func<Category, bool>> filter = null,
-            Func<IQueryable<Category>, ICollection<Category>> options = null,
+        public async Task<ICollection<Description>> GetDescriptionsBy(
+            Expression<Func<Description, bool>> filter = null,
+            Func<IQueryable<Description>, ICollection<Description>> options = null,
             string includeProperties = null
         )
         {
-            IQueryable<Category> query = DbSet;
+            IQueryable<Description> query = DbSet;
 
             if (filter != null)
             {
@@ -43,7 +41,7 @@ namespace Business_Logic.Modules.CategoryModule
                 }
             }
 
-            query = query.Include(c => c.Descriptions.ToList());
+            query = query.Include(d => d.Category);
 
             return options != null ? options(query).ToList() : await query.ToListAsync();
         }
