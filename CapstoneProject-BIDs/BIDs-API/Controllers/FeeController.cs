@@ -10,14 +10,11 @@ using Business_Logic.Modules.FeeModule.Interface;
 using Business_Logic.Modules.FeeModule.Request;
 using BIDs_API.SignalR;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.Authorization;
-using System.Data;
 
 namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class FeeController : ControllerBase
     {
         private readonly IFeeService _FeeService;
@@ -30,7 +27,7 @@ namespace BIDs_API.Controllers
         }
 
         // GET api/<ValuesController>
-        [HttpGet]       
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Fee>>> GetFeesForAdmin()
         {
             try

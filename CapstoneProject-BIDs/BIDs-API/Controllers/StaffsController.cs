@@ -14,7 +14,6 @@ using BIDs_API.SignalR;
 using Microsoft.AspNetCore.SignalR;
 using Business_Logic.Modules.UserModule.Request;
 using System.Collections;
-using Microsoft.AspNetCore.Authorization;
 
 namespace BIDs_API.Controllers
 {

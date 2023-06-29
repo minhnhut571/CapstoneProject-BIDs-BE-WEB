@@ -4,7 +4,6 @@ using Business_Logic.Modules.BanHistoryModule.Interface;
 using Business_Logic.Modules.BanHistoryModule.Request;
 using Business_Logic.Modules.BanHistoryModule.Response;
 using Data_Access.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 

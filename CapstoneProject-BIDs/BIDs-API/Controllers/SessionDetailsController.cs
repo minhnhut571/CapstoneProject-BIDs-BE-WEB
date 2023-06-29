@@ -4,7 +4,6 @@ using Business_Logic.Modules.SessionDetailModule.Interface;
 using Business_Logic.Modules.SessionDetailModule.Request;
 using Business_Logic.Modules.SessionDetailModule.Response;
 using Data_Access.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -12,7 +11,6 @@ namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class SessionDetailsController : ControllerBase
     {
         private readonly ISessionDetailService _SessionDetailService;
