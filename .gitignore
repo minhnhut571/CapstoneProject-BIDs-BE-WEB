@@ -396,3 +396,19 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+CapstoneProject-BIDs/Business-Logic/Modules/UserModule/UserService.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/BanHistoriesController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/BanHistoriesController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/CategoryController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/DescriptionController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/FeeController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/ItemsController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/LoginController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/SessionDetailsController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/SessionsController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/StaffsController.cs
+CapstoneProject-BIDs/BIDs-API/Controllers/UsersController.cs
+CapstoneProject-BIDs/BIDs-API/Startup.cs
+CapstoneProject-BIDs/Business-Logic/Modules/LoginModule/InterFace/ILoginService.cs
+CapstoneProject-BIDs/Business-Logic/Modules/LoginModule/LoginService.cs
+CapstoneProject-BIDs/Business-Logic/Modules/UserModule/UserService.cs
