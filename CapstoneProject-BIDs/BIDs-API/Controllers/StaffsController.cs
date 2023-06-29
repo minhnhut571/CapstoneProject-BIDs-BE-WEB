@@ -20,7 +20,7 @@ namespace BIDs_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Roles = "Staff")]
     public class StaffsController : ControllerBase
     {
         private readonly IStaffService _StaffService;
@@ -64,9 +64,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<StaffResponseStaff>> GetStaffByID([FromRoute] Guid id)
+        public async Task<ActionResult<StaffResponse>> GetStaffByID([FromRoute] Guid id)
         {
-            var Staff = _mapper.Map<StaffResponseStaff>( await _StaffService.GetStaffByID(id));
+            var Staff = _mapper.Map<StaffResponse>( await _StaffService.GetStaffByID(id));
 
             if (Staff == null)
             {
@@ -78,9 +78,9 @@ namespace BIDs_API.Controllers
 
         // GET api/<ValuesController>/abc
         [HttpGet("by_name/{name}")]
-        public async Task<ActionResult<StaffResponseStaff>> GetStaffByName([FromRoute] string name)
+        public async Task<ActionResult<StaffResponse>> GetStaffByName([FromRoute] string name)
         {
-            var Staff = _mapper.Map<StaffResponseStaff>(await _StaffService.GetStaffByName(name));
+            var Staff = _mapper.Map<StaffResponse>(await _StaffService.GetStaffByName(name));
 
             if (Staff == null)
             {
@@ -90,19 +90,18 @@ namespace BIDs_API.Controllers
             return Staff;
         }
 
-        // GET api/<ValuesController>/abc
-        [HttpGet("by_email/{email}")]
-        public async Task<ActionResult<Staff>> GetStaffByEmail([FromRoute] string email)
-        {
-            var Staff = await _StaffService.GetStaffByEmail(email);
+        //[HttpGet("by_account_name/{name}")]
+        //public async Task<ActionResult<StaffResponseAdmin>> GetStaffByAccountName([FromRoute] string name)
+        //{
+        //    var Staff = _mapper.Map<StaffResponseAdmin>(await _StaffService.GetStaffByAccountName(name));
 
-            if (Staff == null)
-            {
-                return NotFound();
-            }
+        //    if (Staff == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Staff;
-        }
+        //    return Staff;
+        //}
 
         // PUT api/<ValuesController>/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

@@ -43,7 +43,6 @@ namespace Business_Logic.Modules.SessionDetailModule
 
             query = query.Include(s => s.User);
             query = query.Include(s => s.Session);
-            query = query.Include(s => s.Session.Item);
 
             return options != null ? options(query).ToList() : await query.ToListAsync();
         }

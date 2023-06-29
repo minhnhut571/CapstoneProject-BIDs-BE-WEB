@@ -42,7 +42,7 @@ namespace Business_Logic.Modules.SessionModule
             }
 
             query = query.Include(s => s.Fee);
-            query = query.Include(s => s.Item);
+
 
             return options != null ? options(query).ToList() : await query.ToListAsync();
         }

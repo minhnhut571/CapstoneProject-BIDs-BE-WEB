@@ -2,7 +2,6 @@
 using Common.Utils.Repository;
 using Data_Access.Entities;
 using Microsoft.EntityFrameworkCore;
-using Polly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +19,6 @@ namespace Business_Logic.Modules.CategoryModule
         {
             _db = db;
         }
-
 
         public async Task<ICollection<Category>> GetCategorysBy(
             Expression<Func<Category, bool>> filter = null,
@@ -42,8 +40,6 @@ namespace Business_Logic.Modules.CategoryModule
                     query = query.Include(includeProp);
                 }
             }
-
-            query = query.Include(c => c.Descriptions.ToList());
 
             return options != null ? options(query).ToList() : await query.ToListAsync();
         }

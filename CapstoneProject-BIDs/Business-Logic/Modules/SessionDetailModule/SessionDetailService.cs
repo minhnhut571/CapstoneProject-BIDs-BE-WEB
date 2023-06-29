@@ -22,12 +22,12 @@ namespace Business_Logic.Modules.SessionDetailModule
 
         public async Task<ICollection<SessionDetail>> GetAll()
         {
-            return await _SessionDetailRepository.GetAll(includeProperties: "User,Session,Session.Item");
+            return await _SessionDetailRepository.GetAll(includeProperties: "User,Session");
         }
 
         public async Task<ICollection<SessionDetail>> GetSessionDetailIsActive()
         {
-            return await _SessionDetailRepository.GetAll(includeProperties: "User,Session,Session.Item", options: x => x.OrderBy(o => o.Status == true).ToList());
+            return await _SessionDetailRepository.GetSessionDetailsBy(x => x.Status == true);
         }
 
         public async Task<ICollection<SessionDetail>> GetSessionDetailsIsInActive()

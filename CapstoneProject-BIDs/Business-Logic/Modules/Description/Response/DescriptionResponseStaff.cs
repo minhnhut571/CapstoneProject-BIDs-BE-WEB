@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace Business_Logic.Modules.DescriptionModule.Response
 {
-    public class DescriptionResponseUserAndStaff
+    public class DescriptionResponseStaff
     {
+        public Guid DescriptionId { get; set; }
         public string DescriptionName { get; set; }
-        public string CategoryName { get; set; }
+        public DateTime UpdateDate { get; set; }
+        public DateTime CreateDate { get; set; }
+        public bool Status { get; set; }
     }
 }
